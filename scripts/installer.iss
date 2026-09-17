@@ -11,12 +11,12 @@
 [Setup]
 AppId={{DECO-TECH-2026-0001}
 AppName=FullTechnology
-AppVersion=3.0
+AppVersion=3.2
 AppPublisher=FULLTECHNOLOGY
 DefaultDirName={autopf}\DecoTechnology
 DefaultGroupName=FullTechnology
 OutputDir=..\installer
-OutputBaseFilename=FullTechnology_Setup_v3.1
+OutputBaseFilename=FullTechnology_Setup_v3.2
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern

@@ -90,5 +90,6 @@ dotnet test FULLTECHNOLOGY.slnx
 
 Sección de seguimiento de cambios del proyecto. Las entradas más recientes van al inicio.
 
+- **2026-09-17 — Instalador v3.2.** Recompilado el instalador self-contained `win-x64` (`FullTechnology_Setup_v3.2.exe`) con los cambios de UI; actualizados `scripts/installer.iss`, `scripts/build-installer.ps1` y changelogs.
 - **2026-09-17 — Publicación inicial en GitHub.** Repositorio público con la estructura completa: frontend Avalonia, backend en capas (Domain/Application/Infrastructure), pruebas y scripts de publicación/instalador.
 - **2026-09-17 — UI: iconos por módulo.** El sidebar, el avatar de usuario del topbar y las tarjetas de mantenimiento ahora usan emojis acordes a cada sección (e.g. 🛒 Ventas, 👤 Clientes, 📦 Inventario); los íconos del sidebar son más grandes. El botón de maximizar/restaurar del título cambia de glifo según el estado de la ventana.

@@ -1,10 +1,10 @@
 # FullTechnology — Instalador
 
-Instalador oficial de **FullTechnology** (`FullTechnology_Setup_v3.1.exe`).
+Instalador oficial de **FullTechnology** (`FullTechnology_Setup_v3.2.exe`).
 
 ## Características del instalador
 
-- **Versión 3.1** generada con **Inno Setup 6** (scripts en `../scripts/installer.iss`).
+- **Versión 3.2** generada con **Inno Setup 6** (scripts en `../scripts/installer.iss`).
 - Instala la **publicación self-contained** de Avalonia para `win-x64` (no requiere .NET runtime ni conexión a internet): toda la carpeta `publish` se copia al directorio de instalación.
 - Mismo **AppId** en todas las versiones → **actualiza en sitio** sin dejar instalaciones huérfanas.
 - Página del instalador para el **nombre del negocio**: se escribe en `%LOCALAPPDATA%\DecoTechnology\settings.ini` y la app lo muestra en el shell.

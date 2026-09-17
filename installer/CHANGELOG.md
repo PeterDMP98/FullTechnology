@@ -2,6 +2,12 @@
 
 Registro de versiones del instalador de FullTechnology.
 
+## v3.2 — 2026-09-17
+
+- **Actualización de interfaz**: iconos por módulo en el sidebar, el avatar de usuario del topbar y las tarjetas de mantenimiento, con íconos más grandes.
+- **Botón maximizar/restaurar dinámico** en el titlebar: cambia de glifo según el estado de la ventana.
+- Recompilado y publicado como instalador self-contained `win-x64` (`FullTechnology_Setup_v3.2.exe`).
+
 ## v3.1 — 2026-09-14
 
 - **Migración a Avalonia (F3–F13)**: el instalador instala la publicación **self-contained** (`net10.0`, `win-x64`, ~247 MB) en lugar del antiguo ZIP/EJECUTABLE WinForms.
