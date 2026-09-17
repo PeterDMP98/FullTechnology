@@ -1,0 +1,30 @@
+<!-- Badges.axaml — Estilos de "pills" de estado (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Pill de estado: altura 26, radio completo (Height/2=13), padding horizontal.
+         El color de fondo (15% de opacidad) y del texto/punto se asignan con
+         StatusBrushConverter (param "soft") en el XAML (§1 regla de pills). -->
+    <Style Selector="Border.Pill">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusPill}" />
+        <Setter Property="Padding" Value="{DynamicResource PaddingPill}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Punto de color que acompaña al texto dentro del pill (indica el estado en sólido). -->
+    <Style Selector="Ellipse.PillDot">
+        <Setter Property="Width" Value="6" />
+        <Setter Property="Height" Value="6" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+
+    <!-- Texto del pill: semibold 12px, centrado verticalmente para alinearse con el punto. -->
+    <Style Selector="TextBlock.PillText">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+</Styles>

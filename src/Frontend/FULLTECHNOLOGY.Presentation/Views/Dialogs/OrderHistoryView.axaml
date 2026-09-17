@@ -1,0 +1,117 @@
+<!-- OrderHistoryView.axaml — Detalle de la orden: datos del cliente, dispositivo, diagnóstico, costo/pagos e historial de pagos. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.OrderHistoryView"
+        x:DataType="vm:OrderHistoryViewModel"
+        Title="{Binding Title}"
+        Width="820" Height="620" MinWidth="720" MinHeight="520"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie: botón único "Cerrar" con handler de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Classes="Primary" Content="Cerrar" Click="OnClose" />
+            </StackPanel>
+        </Border>
+
+        <!-- Detalle desplazable organizado en secciones de datos. -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24" Spacing="16">
+
+                <!-- Sección: datos del cliente (nombre, documento, celular). -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="Datos del cliente" />
+                <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                    <TextBlock Text="Cliente:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Cliente}" />
+                    <TextBlock Grid.Row="1" Text="Documento:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Documento}" />
+                    <TextBlock Grid.Row="2" Text="Celular / WhatsApp:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Celular}" />
+                </Grid>
+
+                <!-- Sección: dispositivo (equipo, serial, estado, fecha de ingreso). -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="Dispositivo" />
+                <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+                    <TextBlock Text="Equipo:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Equipo}" />
+                    <TextBlock Grid.Row="1" Text="IMEI / Serial:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SerialImei}" />
+                    <TextBlock Grid.Row="2" Text="Estado:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding EstadoText}" />
+                    <TextBlock Grid.Row="3" Text="Ingreso:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Ingreso}" />
+                </Grid>
+
+                <!-- Sección: diagnóstico, trabajo realizado y observaciones (con ajuste de línea). -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="Diagnóstico y reparación" />
+                <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                    <TextBlock Text="Diagnóstico:" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="1" Text="{Binding Diagnostico}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="1" Text="Trabajo realizado:" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding TrabajoRealizado}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="2" Text="Observaciones:" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Observaciones}" TextWrapping="Wrap" />
+                </Grid>
+
+                <!-- Sección: total a pagar, total pagado y saldo pendiente (rojo DangerBadge). -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="Costo y pagos" />
+                <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                    <TextBlock Text="Total a pagar:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="1" Text="Total pagado:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding PagadoText}" />
+                    <TextBlock Grid.Row="2" Text="Saldo pendiente:" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding SaldoText}" FontWeight="Bold" Foreground="{DynamicResource DangerBadge}" />
+                </Grid>
+
+                <!-- Sección: historial de pagos con encabezado y filas; mensaje si no hay pagos. -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="Historial de pagos" />
+                <Border BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="1" CornerRadius="10" Padding="8">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="8">
+                            <TextBlock Classes="TableHeader" Text="Fecha" />
+                            <TextBlock Grid.Column="1" Classes="TableHeader" Text="Monto" />
+                            <TextBlock Grid.Column="2" Classes="TableHeader" Text="Medio" />
+                            <TextBlock Grid.Column="3" Classes="TableHeader" Text="Concepto" />
+                            <TextBlock Grid.Column="4" Classes="TableHeader" Text="Saldo" />
+                        </Grid>
+                        <ScrollViewer Grid.Row="1" MaxHeight="160" VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <!-- Filas de pagos del VM (Historial). -->
+                                <ItemsControl ItemsSource="{Binding Historial}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:PagoRow">
+                                            <Border BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,0,0,1" Padding="4,4">
+                                                <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="8">
+                                                    <TextBlock Text="{Binding Fecha}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Monto}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding Metodo}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="3" Text="{Binding Concepto}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="4" Text="{Binding Saldo}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <!-- Mensaje cuando la orden no tiene pagos (IsVisible negado sobre HasPagos). -->
+                                <TextBlock Text="Sin pagos registrados" Foreground="{DynamicResource TextSecondary}"
+                                           HorizontalAlignment="Center" Padding="12"
+                                           IsVisible="{Binding !HasPagos}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+
+</Window>

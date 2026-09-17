@@ -1,0 +1,191 @@
+<!-- HistorialVentaView.axaml — Historial de ventas: barra de filtros, resumen del periodo y tabla con detalle de cada factura. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+             xmlns:vmm="using:FULLTECHNOLOGY.Presentation.ViewModels.HistorialVenta"
+             xmlns:auto="using:Avalonia.Automation"
+             x:Class="FULLTECHNOLOGY.Presentation.Views.HistorialVentaView"
+             x:DataType="vm:HistorialVentaViewModel">
+
+    <!-- Layout vertical: barra de filtros (50) → resumen del periodo (34) → tabla (*). -->
+    <Grid RowDefinitions="40,34,*" RowSpacing="10">
+
+        <!-- ========= Barra de filtros ========= -->
+        <!-- Filtros: rango Desde/Hasta, medio de pago, buscador de factura/cliente y total del periodo.
+             Columnas * proporcionales (MinWidth en los controles) para que nunca se despilfarren ni se salgan. -->
+        <Grid ColumnDefinitions="Auto,1.4*,Auto,1.4*,Auto,1.4*,2.1*,Auto" Height="{DynamicResource HeightToolbar}" ColumnSpacing="4">
+           
+			<TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}">Desde:</TextBlock>
+			<DatePicker Grid.Column="1"
+						Width="140"
+						MinWidth="0"
+						MaxWidth="140"
+						Height="{DynamicResource HeightControl}"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						SelectedDate="{Binding FechaDesde, Mode=TwoWay}"
+						DayFormat="dd"
+						MonthFormat="MM"
+						YearFormat="yyyy" />
+			
+			<TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}">Hasta:</TextBlock>
+			<DatePicker Grid.Column="3"
+						Width="140"
+						MinWidth="0"
+						MaxWidth="140"
+						Height="{DynamicResource HeightControl}"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						SelectedDate="{Binding FechaHasta, Mode=TwoWay}"
+						DayFormat="dd"
+						MonthFormat="MM"
+						YearFormat="yyyy" />
+           
+			<TextBlock Grid.Column="4" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}">Medio:</TextBlock>
+            <ComboBox Grid.Column="5" Height="{DynamicResource HeightControl}" MinWidth="130" VerticalAlignment="Center"
+                      ItemsSource="{Binding MetodoOptions}" SelectedIndex="{Binding MetodoIndex}" />
+          
+			<Grid Grid.Column="6" VerticalAlignment="Center">
+                <!-- Buscador con lupa (búsqueda en vivo); la lupa (⌕) es decorativa. -->
+                <TextBox Classes="Input" Padding="{DynamicResource PaddingInputIconCompact}" Height="{DynamicResource HeightControl}" MinWidth="180"
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         PlaceholderText="Buscar factura o cliente..." />
+                <TextBlock Text="&#x2315;" FontSize="{DynamicResource FontSizeTitle}" Foreground="{DynamicResource TextSecondary}"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"
+                           IsHitTestVisible="False" />
+            </Grid>
+            <!-- Total del periodo en verde (StatusSuccess), anclado a la derecha. -->
+            <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"
+                        HorizontalAlignment="Right" MinWidth="110">
+                <TextBlock Text="{Binding TotalText}" FontWeight="Bold" VerticalAlignment="Center"
+                           Foreground="{DynamicResource StatusSuccess}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- ========= Resumen del periodo ========= -->
+        <!-- Banda de resumen: texto del periodo a la izquierda y nota de uso a la derecha. -->
+        <Border Grid.Row="1" Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" Padding="16,0">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding ResumenText}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextSecondary}" />
+                <TextBlock Grid.Column="1" Text="Doble clic o Ver para el detalle de la factura." FontSize="{DynamicResource FontSizeSubtitle}"
+                           VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+            </Grid>
+        </Border>
+
+        <!-- ========= Tabla del historial ========= -->
+        <!-- Tarjeta de tabla: encabezado + filas con los datos de la factura y botón "Ver". -->
+        <Border Grid.Row="2" Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
+            <!-- Un solo ScrollViewer horizontal mantiene header + filas alineados (TreeDataGrid #256) -->
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <Grid MinWidth="860" RowDefinitions="Auto,*">
+                    <!-- Encabezado -->
+                    <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
+                        <Grid>
+<Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" MinWidth="140" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" MinWidth="110" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Classes="TableHeader" Text="Factura" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Classes="TableHeader" Text="Fecha" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="TableHeader" Text="Cliente" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Classes="TableHeader" Text="Subtotal" TextAlignment="Right" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="4" Classes="TableHeader" Text="Descuento" TextAlignment="Right" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="5" Classes="TableHeader" Text="Total" TextAlignment="Right" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="6" Classes="TableHeader" Text="Medio" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="7" Classes="TableHeader" Text="Opciones" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Cuerpo: filas + estados vacío/cargando -->
+                    <!-- Capa de filas: cada venta muestra factura, fecha, cliente, montos alineados a la derecha
+                         y botón "Ver" (dispara VerCommand con el propio ítem). -->
+                    <Grid Grid.Row="1">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Rows}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vmm:HistorialVentaRowViewModel">
+                                        <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
+                                            <Grid>
+<Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="120" />
+                                                <ColumnDefinition Width="*" MinWidth="140" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="*" MinWidth="110" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Factura}" Classes="TableCell"
+                                                       Foreground="{DynamicResource AccentPrimaryLight}" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Fecha}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Cliente}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Cliente}" />
+                                            <TextBlock Grid.Column="3" Text="{Binding Subtotal}" Classes="TableCell"
+                                                       TextAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="4" Text="{Binding Descuento}" Classes="TableCell"
+                                                       TextAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="5" Text="{Binding Total}" Classes="TableCell"
+                                                       TextAlignment="Right" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="6" Text="{Binding Medio}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <Button Classes="Table" Width="60" Content="Ver"
+                                                        Command="{Binding VerCommand}" CommandParameter="{Binding}"
+                                                        ToolTip.Tip="Ver detalle de la factura" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Estado: cargando -->
+                    <!-- Overlay con ProgressBar mientras IsLoading. -->
+                    <Border Classes="LoadingOverlay" IsVisible="{Binding IsLoading}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                            <ProgressBar Width="180" IsIndeterminate="True" />
+                            <TextBlock Text="Cargando ventas..." Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Estado: error de carga (mensaje amigable + reintento) -->
+                    <!-- Overlay de error (opacidad alta): glifo ⚠, título, mensaje del VM y Reintentar. -->
+                    <Border Classes="LoadingOverlay error" IsVisible="{Binding IsError}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" MaxWidth="480">
+                            <TextBlock Classes="StateGlyph StateGlyphError" Text="&#x26A0;" />
+                            <TextBlock Classes="StateTitle" Text="No se pudieron cargar las ventas" />
+                            <TextBlock Classes="StateBody" Text="{Binding ErrorMessage}" />
+                            <Button Classes="Secondary" Content="Reintentar" Command="{Binding RetryCommand}"
+                                    HorizontalAlignment="Center" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Estado: vacío -->
+                    <!-- Mensaje central cuando no hay ventas para el periodo y filtros (IsEmpty). -->
+                    <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                        <TextBlock Classes="StateGlyph" Text="&#x25A6;" />
+                        <TextBlock Classes="StateBody" Text="No hay ventas para el periodo y filtros seleccionados." />
+                    </StackPanel>
+                </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+
+</UserControl>

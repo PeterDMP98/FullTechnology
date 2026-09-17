@@ -1,0 +1,37 @@
+<!-- CantidadDialogView.axaml — Diálogo para indicar una cantidad: NumericUpDown con límite máximo del VM y botones Cancelar/Aceptar. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.CantidadDialogView"
+        x:DataType="vm:CantidadDialogViewModel"
+        Title="{Binding Title}"
+        Width="340" Height="210" MinWidth="320" MinHeight="190"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: Cancelar / Aceptar con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Aceptar" Click="OnAceptar" />
+            </StackPanel>
+        </Border>
+
+        <!-- Cuerpo centrado: etiqueta "Cantidad:", entrada numérica (mínimo 1, máximo del VM) e indicador del máximo. -->
+        <StackPanel Margin="24" Spacing="12" VerticalAlignment="Center">
+            <TextBlock Text="Cantidad:" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" />
+            <NumericUpDown Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="160"
+                           Minimum="1" Maximum="{Binding Max}" Increment="1"
+                           FormatString="0"
+                           Value="{Binding Cantidad, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <!-- Texto compuesto con Run estáticos y un Run enlazado al máximo permitido. -->
+            <TextBlock VerticalAlignment="Center">
+                <Run Text="Cantidad máxima: " Foreground="{DynamicResource TextSecondary}" />
+                <Run Text="{Binding Max, Mode=OneWay}" Foreground="{DynamicResource TextSecondary}" />
+            </TextBlock>
+        </StackPanel>
+    </DockPanel>
+
+</Window>

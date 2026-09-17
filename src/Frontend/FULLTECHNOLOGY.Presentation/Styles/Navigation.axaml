@@ -1,0 +1,18 @@
+<!-- Navigation.axaml — Estilos de la identidad de marca en la navegación (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Marca de la barra lateral -->
+    <!-- Nombre del negocio en el sidebar: tipografía de título en bold. -->
+    <Style Selector="TextBlock.BrandName">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeTitle}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+    <!-- Subtítulo de marca (p. ej. "Powered by …"): caption en color secundario. -->
+    <Style Selector="TextBlock.BrandSub">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+    </Style>
+
+</Styles>

@@ -1,0 +1,358 @@
+﻿<!-- MantenimientoView.axaml — Módulo de órdenes de reparación: toolbar, tarjetas de estadísticas, tabla ordenable con filtros, estados de carga/error/vacío y paginación. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+             xmlns:vmm="using:FULLTECHNOLOGY.Presentation.ViewModels.Mantenimiento"
+             xmlns:conv="using:FULLTECHNOLOGY.Presentation.Converters"
+             xmlns:auto="using:Avalonia.Automation"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+             x:Class="FULLTECHNOLOGY.Presentation.Views.MantenimientoView"
+             x:DataType="vm:MantenimientoViewModel">
+
+<UserControl.Resources>
+        <!-- StatusBrush/TokenBrush/IsActive se heredan de Application.Resources (App.axaml). -->
+        <!-- ÚNICO recurso local de esta vista: PageActiveConverter con clave PageActive.
+             Solo existe aquí (no es global como StatusBrush/TokenBrush/IsActive) y sirve para
+             resaltar la página actual del paginador. -->
+        <conv:PageActiveConverter x:Key="PageActive" />
+    </UserControl.Resources>
+
+    <!-- Layout vertical del módulo: fila toolbar → fila de tarjetas stat → tabla (*) → pie de paginación. -->
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="20">
+
+        <!-- ===================== TOOLBAR (spec Â§3.3.b) ===================== -->
+        <!-- Barra superior: botón "+ Nuevo ingreso", buscador con lupa y combo de filtro por estado. -->
+<Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Height="{DynamicResource HeightToolbar}">
+
+            <Button Grid.Column="0" Classes="Primary" Content="+ Nuevo ingreso" Width="170" Height="{DynamicResource HeightToolbar}"
+                    Command="{Binding NuevoIngresoCommand}"
+                    HorizontalAlignment="Left" VerticalAlignment="Center" />
+
+            <!-- Buscador (patrón Auto,*,Auto: crece hasta agotar el ancho disponible) -->
+            <!-- Busca en vivo (UpdateSourceTrigger=PropertyChanged) por cliente, IMEI u orden;
+                 la lupa (⌕) es decorativa: IsHitTestVisible=False sin afectar al input. -->
+            <Grid Grid.Column="1" Height="{DynamicResource HeightToolbar}">
+                <TextBox Classes="Input" Height="{DynamicResource HeightToolbar}" Padding="{DynamicResource PaddingInputIcon}"
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         PlaceholderText="Buscar cliente, IMEI, orden..." />
+
+                <TextBlock Text="&#x2315;" FontSize="{DynamicResource FontSizeIcon}" Foreground="{DynamicResource TextSecondary}"
+                           HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Margin="0,0,14,0" IsHitTestVisible="False" />
+            </Grid>
+
+            <!-- Combo de estado -->
+            <!-- Filtro por estado de la orden; el ítem se muestra con su Label (vmm:StatusOption). -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Right">
+
+                <TextBlock Text="Estado:" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+
+                <ComboBox Classes="Filter" Width="165" Height="{DynamicResource HeightToolbar}" HorizontalAlignment="Right"
+                          ItemsSource="{Binding StatusOptions}"
+                          SelectedItem="{Binding SelectedStatus}">
+
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vmm:StatusOption">
+                            <TextBlock Text="{Binding Label}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+        </Grid>
+
+        <!-- ===================== STAT CARDS (spec Â§3.3.c) ===================== -->
+        <!-- Fila de 5 tarjetas de estadística seleccionables: cada tarjeta es un botón cuyo comando
+             (SelectCommand) activa el filtro; el borde usa IsActive (convertidor global) para marcar
+             la tarjeta actual y los colores se resuelven con TokenBrush según AccentToken. -->
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Cards}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="5" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vmm:StatCardViewModel">
+                    <Button Background="Transparent" Padding="0" Margin="0,0,12,0"
+                            HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                            Command="{Binding SelectCommand}">
+                        <Border Classes="StatCard" HorizontalAlignment="Stretch"
+                                BorderBrush="{Binding IsSelected, Converter={StaticResource IsActive}}" BorderThickness="1">
+                            <StackPanel Spacing="14">
+                                <!-- Fila superior: ícono sobre fondo suave (soft) del token + número/label. -->
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                                    <Border Classes="StatIcon"
+                                            Background="{Binding AccentToken, Converter={StaticResource TokenBrush}, ConverterParameter=soft}">
+                                        <TextBlock Text="{Binding Glyph}" FontSize="{DynamicResource FontSizeHero}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Foreground="{Binding AccentToken, Converter={StaticResource TokenBrush}}" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                        <TextBlock Classes="StatNumber" Text="{Binding Value}" />
+                                        <TextBlock Classes="StatLabel" Text="{Binding Label}" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Grid>
+                                <!-- Barra inferior de color sólido del token. -->
+                                <Border Classes="StatBar" HorizontalAlignment="Left"
+                                        Background="{Binding AccentToken, Converter={StaticResource TokenBrush}}" />
+                            </StackPanel>
+                        </Border>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- ===================== TABLA (spec Â§3.3.d) ===================== -->
+        <!-- Tarjeta de tabla: encabezado ordenable (40px) + cuerpo con scroll y overlays de estado. -->
+        <Border Grid.Row="2" Background="{DynamicResource BgCard}"
+                CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
+            <!-- Un solo ScrollViewer horizontal mantiene header + filas alineados al scroll
+                 (TreeDataGrid #256); el ancho mínimo de columna se fija en ColumnDefinition -->
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <Grid MinWidth="990" RowDefinitions="Auto,*">
+
+                    <!-- Header de columnas (orden por click) -->
+                    <!-- Cada columna es un botón que dispara SortByColumnCommand con el enum SortColumn
+                         como parámetro; la flecha de dirección (Arrow*) se pinta en acento claro. -->
+                    <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
+                        <Grid>
+<Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="*" MinWidth="120" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" MinWidth="120" />
+                            <ColumnDefinition Width="*" MinWidth="110" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.OrderNumber}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Orden" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowOrderNumber}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="1" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Cliente}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Cliente" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowCliente}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="2" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Documento}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Documento" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowDocumento}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="3" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Celular}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Celular" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowCelular}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="4" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Equipo}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Equipo" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowEquipo}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="5" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Estado}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Estado" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowEstado}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="6" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Ingreso}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Ingreso" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowIngreso}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="7" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Total}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Total" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowTotal}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="8" Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Command="{Binding SortByColumnCommand}" CommandParameter="{x:Static vmm:SortColumn.Saldo}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Classes="TableHeader" Text="Saldo" />
+                                <TextBlock Classes="TableHeader" Text="{Binding ArrowSaldo}" Foreground="{DynamicResource AccentPrimaryLight}" />
+                            </StackPanel>
+                        </Button>
+                        <TextBlock Grid.Column="9" Classes="TableHeader" Text="Opciones" VerticalAlignment="Center" />
+                    </Grid>
+                    </Border>
+
+                    <!-- Cuerpo: filas + estados vacío/cargando -->
+                    <!-- Capa de filas: ItemsControl con scroll vertical. Por cada orden: celdas de texto,
+                         pill de estado (StatusBrush + soft), botón "Ver" y botón de acciones (⋯) vía code-behind. -->
+                    <Grid Grid.Row="1">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Rows}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vmm:OrderRowViewModel">
+                                        <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
+                                            <Grid>
+<Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="130" />
+                                                <ColumnDefinition Width="*" MinWidth="120" />
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="*" MinWidth="120" />
+                                                <ColumnDefinition Width="*" MinWidth="110" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding OrderNumber}" Classes="TableCell"
+                                                       Foreground="{DynamicResource AccentPrimaryLight}" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Cliente}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Cliente}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Documento}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="3" Text="{Binding Celular}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="4" Text="{Binding Equipo}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Equipo}" />
+                                            <Border Grid.Column="5" Classes="Pill"
+                                                    HorizontalAlignment="Left"
+                                                    Background="{Binding Status, Converter={StaticResource StatusBrush}, ConverterParameter=soft}">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <Ellipse Classes="PillDot" Fill="{Binding Status, Converter={StaticResource StatusBrush}}" />
+                                                    <TextBlock Classes="PillText" Text="{Binding Status}"
+                                                               Foreground="{Binding Status, Converter={StaticResource StatusBrush}}" />
+                                                </StackPanel>
+                                            </Border>
+                                            <TextBlock Grid.Column="6" Text="{Binding Ingreso}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="7" Text="{Binding Total}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="8" Text="{Binding Saldo}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Grid.Column="9" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <!-- Botón "Ver": abre detalle/pagos/historial (Command). Botón ⋯: menú de acciones (Click code-behind, sin texto). -->
+                                                <Button Classes="Table" Width="78" Content="Ver"
+                                                        Command="{Binding VerCommand}" CommandParameter="{Binding}"
+                                                        ToolTip.Tip="Ver detalle, pagos e historial de la orden" />
+                                                <Button Classes="Table" Width="44" Content="&#x22EF;"
+                                                        Click="OnOptionsClick" ToolTip.Tip="Acciones de la orden"
+                                                        auto:AutomationProperties.Name="Acciones de la orden" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Estado: cargando -->
+                    <!-- Overlay semiopaco con ProgressBar mientras IsLoading (estilos Border.LoadingOverlay). -->
+                    <Border Classes="LoadingOverlay" IsVisible="{Binding IsLoading}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                            <ProgressBar Width="180" IsIndeterminate="True" />
+                            <TextBlock Text="Cargando Ã³rdenes..." Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Estado: error de carga (mensaje amigable + reintento) -->
+                    <!-- Overlay con opacidad alta (variante error): glifo ⚠, título, mensaje del VM y botón Reintentar. -->
+                    <Border Classes="LoadingOverlay error" IsVisible="{Binding IsError}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" MaxWidth="480">
+                            <TextBlock Classes="StateGlyph StateGlyphError" Text="&#x26A0;" />
+                            <TextBlock Classes="StateTitle" Text="No se pudieron cargar las Ã³rdenes" />
+                            <TextBlock Classes="StateBody" Text="{Binding ErrorMessage}" />
+                            <Button Classes="Secondary" Content="Reintentar" Command="{Binding RetryCommand}"
+                                    HorizontalAlignment="Center" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Estado: vacÃ­o -->
+                    <!-- Mensaje central cuando no hay órdenes con los filtros actuales (IsEmpty). -->
+                    <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                        <TextBlock Classes="StateGlyph" Text="&#x25A6;" />
+                        <TextBlock Classes="StateBody" Text="No se encontraron Ã³rdenes con los filtros actuales." />
+                    </StackPanel>
+                </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ===================== PIE: paginacionn (10/25/50) ===================== -->
+        <!-- Pie: resumen (total de órdenes, página, moneda), selector de tamaño de página (10/25/50),
+             botones ‹/› y número de página (la página actual se resalta con PageActive, recurso local). -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center">Ordenes:</TextBlock>
+                <TextBlock Text="{Binding TotalRows}" VerticalAlignment="Center" />
+                <TextBlock Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center">Pagina</TextBlock>
+                <TextBlock Text="{Binding CurrentPage}" VerticalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Foreground="{DynamicResource TextSecondary}" Text="Mostrar:" VerticalAlignment="Center" />
+                <ComboBox Classes="Filter" Width="72" VerticalAlignment="Center"
+                          ItemsSource="{Binding PageSizes}" SelectedItem="{Binding PageSize, Mode=TwoWay}" />
+            </StackPanel>
+
+            <Button Grid.Column="2" Classes="Page" Content="&#x2039;" 
+					HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Command="{Binding PrevPageCommand}" IsEnabled="{Binding HasPrev}"
+                    ToolTip.Tip="Pagina anterior" auto:AutomationProperties.Name="Pagina anterior" />
+
+            <!-- Números de página generados por el VM; Background ligado a IsCurrent con PageActive (local). -->
+            <ItemsControl Grid.Column="3" ItemsSource="{Binding PageNumbers}" VerticalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="4" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vmm:PageItem">
+                        <Button Classes="Page" Content="{Binding Number}" Command="{Binding Go}"
+								HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Background="{Binding IsCurrent, Converter={StaticResource PageActive}}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Button Grid.Column="4" Classes="Page" Content="&#x203A;"
+					HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Command="{Binding NextPageCommand}" IsEnabled="{Binding HasNext}"
+                    ToolTip.Tip="Pagina siguiente" auto:AutomationProperties.Name="Pagina siguiente" />
+        </Grid>
+    </Grid>
+
+</UserControl>

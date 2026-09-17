@@ -1,0 +1,37 @@
+<!-- LightTheme.axaml — Paleta de tokens de color clara (los recursos son tokens, NO se traducen). -->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- DeccoTokens: paleta clara REAL (spec §24 / Theme.Light de referencia).
+         Los colores de estado son semánticos y se mantienen iguales en ambos temas.
+         Las claves coinciden con DarkTheme.axaml para que los {DynamicResource} funcionen en ambos temas. -->
+    <!-- Fondo base de la aplicación (área de contenido). -->
+    <SolidColorBrush x:Key="BgApp" Color="#F2F5F9" />
+    <!-- Fondo de la barra lateral y la barra inferior. -->
+    <SolidColorBrush x:Key="BgSidebar" Color="#E9EDF2" />
+    <!-- Fondo de tarjetas, encabezados de página y cajas input. -->
+    <SolidColorBrush x:Key="BgCard" Color="#FFFFFF" />
+    <!-- Fondo alterno de filas (hover de tabla / caja resaltada). -->
+    <SolidColorBrush x:Key="BgRowAlt" Color="#EDF1F6" />
+    <!-- Borde sutil (separadores, bordes de inputs y tarjetas). -->
+    <SolidColorBrush x:Key="BorderSubtle" Color="#D7DEE7" />
+    <!-- Texto principal (azul marino oscuro). -->
+    <SolidColorBrush x:Key="TextPrimary" Color="#1E2A38" />
+    <!-- Texto secundario / descriptivo (gris). -->
+    <SolidColorBrush x:Key="TextSecondary" Color="#5C6976" />
+    <!-- Color de acento principal (botón primario, selección de sidebar). -->
+    <SolidColorBrush x:Key="AccentPrimary" Color="#2563EB" />
+    <!-- Variante clara del acento (hover de botón, cifras resaltadas). -->
+    <SolidColorBrush x:Key="AccentPrimaryLight" Color="#3B82F6" />
+    <!-- Token semántico de estado: éxito (verde). -->
+    <SolidColorBrush x:Key="StatusSuccess" Color="#16A34A" />
+    <!-- Token semántico de estado: advertencia (ámbar). -->
+    <SolidColorBrush x:Key="StatusWarning" Color="#D97706" />
+    <!-- Token semántico de estado: púrpura. -->
+    <SolidColorBrush x:Key="StatusPurple" Color="#7C3AED" />
+    <!-- Token semántico de estado: teal. -->
+    <SolidColorBrush x:Key="StatusTeal" Color="#0D9488" />
+    <!-- Token semántico de estado: información (cielo). -->
+    <SolidColorBrush x:Key="StatusInfo" Color="#0284C7" />
+    <!-- Peligro / alerta (rojo). -->
+    <SolidColorBrush x:Key="DangerBadge" Color="#DC2626" />
+</ResourceDictionary>

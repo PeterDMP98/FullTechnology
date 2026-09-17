@@ -1,0 +1,62 @@
+<!-- ClienteEditDialogView.axaml — Diálogo de alta/edición de cliente o proveedor: campos generales y campos extra visibles solo para proveedor. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.ClienteEditDialogView"
+        x:DataType="vm:ClienteEditDialogViewModel"
+        Title="{Binding Title}"
+        Width="560" Height="520" MinWidth="520" MinHeight="480"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: Cancelar / Guardar con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Guardar" Click="OnSave" />
+            </StackPanel>
+        </Border>
+
+        <!-- Formulario desplazable con etiqueta + control en cada fila. -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24" Spacing="16">
+                <!-- Tipo -->
+                <!-- Selector de tipo de cliente proveedor (condiciona qué campos se muestran). -->
+                <Grid ColumnDefinitions="200,*" ColumnSpacing="12">
+                    <TextBlock Text="Tipo de cliente" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <ComboBox Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}"
+                              ItemsSource="{Binding TipoOptions}"
+                              SelectedItem="{Binding SelectedTipo}" />
+                </Grid>
+
+                <!-- Campos generales -->
+                <!-- Nombre, documento y celular (obligatorios marcados con *). -->
+                <Grid ColumnDefinitions="200,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto" RowSpacing="16">
+                    <TextBlock Text="Nombre *" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Nombre, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="1" Text="Documento de identidad / NIT" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Grid.Row="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Documento, Mode=TwoWay}"
+                             PlaceholderText="Documento o NIT" />
+                    <TextBlock Grid.Row="2" Text="Número de celular o WhatsApp *" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Celular, Mode=TwoWay}"
+                             PlaceholderText="Obligatorio" />
+                </Grid>
+
+                <!-- Campos visibles solo para proveedor -->
+                <!-- Dirección, web y red social; el bloque es visible únicamente cuando EsProveedor. -->
+                <Grid ColumnDefinitions="200,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto" RowSpacing="16"
+                      IsVisible="{Binding EsProveedor}">
+                    <TextBlock Text="Dirección" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Direccion, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="1" Text="Web" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Grid.Row="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Web, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="2" Text="Red Social" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding RedSocial, Mode=TwoWay}" />
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+
+</Window>

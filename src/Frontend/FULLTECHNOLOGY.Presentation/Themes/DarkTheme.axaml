@@ -1,0 +1,36 @@
+<!-- DarkTheme.axaml — Paleta de tokens de color oscura (los recursos son tokens, NO se traducen). -->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- DeccoTokens: paleta oscura (spec-diseno §1, valores exactos).
+         Todos los colores de la UI se consumen con {DynamicResource <clave>}; ningún hex se usa fuera de estos temas. -->
+    <!-- Fondo base de la aplicación (área de contenido). -->
+    <SolidColorBrush x:Key="BgApp" Color="#0F1A2E" />
+    <!-- Fondo de la barra lateral y la barra inferior. -->
+    <SolidColorBrush x:Key="BgSidebar" Color="#0B1220" />
+    <!-- Fondo de tarjetas, encabezados de página y cajas input. -->
+    <SolidColorBrush x:Key="BgCard" Color="#16223A" />
+    <!-- Fondo alterno de filas (hover de tabla / caja resaltada). -->
+    <SolidColorBrush x:Key="BgRowAlt" Color="#1C2A42" />
+    <!-- Borde sutil (separadores, bordes de inputs y tarjetas). -->
+    <SolidColorBrush x:Key="BorderSubtle" Color="#24314A" />
+    <!-- Texto principal (blanco). -->
+    <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" />
+    <!-- Texto secundario / descriptivo (gris azulado). -->
+    <SolidColorBrush x:Key="TextSecondary" Color="#8A94A6" />
+    <!-- Color de acento principal (botón primario, selección de sidebar). -->
+    <SolidColorBrush x:Key="AccentPrimary" Color="#2563EB" />
+    <!-- Variante clara del acento (hover de botón, cifras resaltadas). -->
+    <SolidColorBrush x:Key="AccentPrimaryLight" Color="#4C8DFF" />
+    <!-- Token semántico de estado: éxito (verde). -->
+    <SolidColorBrush x:Key="StatusSuccess" Color="#22C55E" />
+    <!-- Token semántico de estado: advertencia (ámbar). -->
+    <SolidColorBrush x:Key="StatusWarning" Color="#F59E0B" />
+    <!-- Token semántico de estado: púrpura. -->
+    <SolidColorBrush x:Key="StatusPurple" Color="#8B5CF6" />
+    <!-- Token semántico de estado: teal. -->
+    <SolidColorBrush x:Key="StatusTeal" Color="#14B8A6" />
+    <!-- Token semántico de estado: información (cielo). -->
+    <SolidColorBrush x:Key="StatusInfo" Color="#38BDF8" />
+    <!-- Peligro / alerta (rojo) — usado en el botón Cerrar del titlebar y saldos pendientes. -->
+    <SolidColorBrush x:Key="DangerBadge" Color="#EF4444" />
+</ResourceDictionary>

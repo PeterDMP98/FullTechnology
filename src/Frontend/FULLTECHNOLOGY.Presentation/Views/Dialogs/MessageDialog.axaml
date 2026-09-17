@@ -1,0 +1,26 @@
+<!-- MessageDialog.axaml — Diálogo genérico de mensaje/petición de texto: cuerpo opcional, input oculto para renombrar y botones dinámicos. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.MessageDialog"
+        Title="FULLTECHNOLOGY"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Classes="Dialog">
+
+    <!-- Cuerpo del diálogo: mensaje (DialogBody), campo de texto opcional (p. ej. "nuevo nombre")
+         y pie con botones Cancelar (oculto por defecto) / Aceptar, controlados desde code-behind. -->
+    <StackPanel Width="430" Margin="24" Spacing="16">
+        <TextBlock x:Name="MessageText" Classes="DialogBody" TextWrapping="Wrap" MaxWidth="430" />
+        <TextBox x:Name="Input" Classes="Input" IsVisible="False" PlaceholderText="Escriba el nuevo nombre" />
+
+        <Border Classes="DialogFooter">
+            <StackPanel Classes="DialogButtons">
+                <Button x:Name="CancelButton" Classes="Secondary" Content="Cancelar" IsVisible="False" Click="OnCancel" />
+                <Button x:Name="OkButton" Classes="Primary" Content="Aceptar" Click="OnOk" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+
+</Window>

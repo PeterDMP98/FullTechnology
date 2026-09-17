@@ -1,0 +1,52 @@
+<!-- BuscarClienteView.axaml — Diálogo de búsqueda de clientes: campo de filtro en vivo, lista de resultados (doble clic para aceptar) y botones Cancelar/Aceptar. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.BuscarClienteView"
+        x:DataType="vm:BuscarClienteViewModel"
+        Title="{Binding Title}"
+        Width="700" Height="500" MinWidth="640" MinHeight="420"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: botones Cancelar / Aceptar con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Aceptar" Click="OnAccept" />
+            </StackPanel>
+        </Border>
+
+        <!-- Cuerpo del diálogo: buscador en vivo + lista de resultados + aviso de sin resultados. -->
+        <StackPanel Margin="24" Spacing="12">
+            <!-- Instrucción de búsqueda. -->
+            <TextBlock Text="Buscar por nombre, documento de identidad o número de celular:"
+                       Foreground="{DynamicResource TextPrimary}" />
+            <!-- Caja de búsqueda con filtrado en vivo (UpdateSourceTrigger=PropertyChanged). -->
+            <TextBox Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     PlaceholderText="Escriba para filtrar..." />
+
+            <!-- Lista de resultados: doble clic acepta (DoubleTapped), cada fila muestra nombre/doc/celular. -->
+            <ListBox x:Name="ResultsList" ItemsSource="{Binding Results}" MinHeight="260"
+                     DoubleTapped="OnListDoubleTapped" Background="{DynamicResource BgCard}"
+                     BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="1" CornerRadius="10">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ClienteRow">
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                            <TextBlock Text="{Binding Nombre}" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="1" Text="{Binding Documento}" Foreground="{DynamicResource TextSecondary}" />
+                            <TextBlock Grid.Column="2" Text="{Binding Celular}" Foreground="{DynamicResource TextSecondary}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Aviso de "sin resultados": visible solo cuando !TieneResultados (binding negado). -->
+            <TextBlock Text="No se encontraron clientes." Foreground="{DynamicResource TextSecondary}"
+                       HorizontalAlignment="Center" IsVisible="{Binding !TieneResultados}" />
+        </StackPanel>
+    </DockPanel>
+
+</Window>

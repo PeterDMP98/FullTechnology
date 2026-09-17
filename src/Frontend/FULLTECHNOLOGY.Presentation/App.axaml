@@ -1,0 +1,46 @@
+<!-- App.axaml — Raíz de la aplicación: fusiona los temas Dark/Light, registra los convertidores globales (StatusBrush, IsActive, TokenBrush) y aplica el FluentTheme con los estilos del Design System. -->
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FULLTECHNOLOGY.Presentation.App"
+             xmlns:local="using:FULLTECHNOLOGY.Presentation"
+             xmlns:conv="using:FULLTECHNOLOGY.Presentation.Converters"
+             RequestedThemeVariant="Default">
+
+    <!-- ViewLocator: enlaza cada ViewModel con su Vista (seguimiento del sufijo *ViewModel → *View). -->
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Diccionarios por tema: "Dark" y "Light". Cada vista los consulta con {DynamicResource};
+                 todos los colores son tokens de DarkTheme.axaml / LightTheme.axaml (no hay hex hardcodeados). -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <ResourceDictionary.MergedDictionaries>
+                        <MergeResourceInclude Source="avares://FULLTECHNOLOGY.Presentation/Themes/DarkTheme.axaml" />
+                    </ResourceDictionary.MergedDictionaries>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <ResourceDictionary.MergedDictionaries>
+                        <MergeResourceInclude Source="avares://FULLTECHNOLOGY.Presentation/Themes/LightTheme.axaml" />
+                    </ResourceDictionary.MergedDictionaries>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <!-- Convertidores globales (heredados por TODA la app, incluidas las vistas y sus UserControl.Resources):
+                 StatusBrush → color semántico de estado del "status"; IsActive → borde/fondo según selección;
+                 TokenBrush → color activo según la clave de token (ej. AccentPrimary, StatusSuccess). -->
+            <conv:StatusBrushConverter x:Key="StatusBrush" />
+            <conv:IsActiveConverter x:Key="IsActive" />
+            <conv:TokenBrushConverter x:Key="TokenBrush" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <!-- FluentTheme = base de controles de Avalonia; Base.axaml importa todos los estilos del Design System
+             (Buttons, Inputs, Cards, Badges, Tables, Navigation, Dialogs, States) + tokens de Typography/Spacing. -->
+        <FluentTheme />
+        <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Base.axaml" />
+    </Application.Styles>
+</Application>

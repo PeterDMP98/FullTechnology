@@ -1,0 +1,66 @@
+<!-- Inputs.axaml — Estilos de campos de entrada (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Input estándar: BgCard, borde sutil 1px, esquinas 10 (spec §3.3.b) -->
+    <Style Selector="TextBox.Input">
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+        <Setter Property="Padding" Value="{DynamicResource PaddingInput}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- ComboBox del filtro de estado (mismo estilo de los inputs) -->
+    <Style Selector="ComboBox.Filter">
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+        <Setter Property="MinHeight" Value="40" />
+    </Style>
+
+    <!-- DatePicker / otros inputs -->
+	<Style Selector="DatePicker">
+		<Setter Property="Background" Value="{DynamicResource BgCard}" />
+		<Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+		<Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+		<Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+	</Style>
+
+	<Style Selector="DatePicker /template/ TextBlock#PART_DayTextBlock">
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="TextAlignment" Value="Center" />
+	</Style>
+
+	<Style Selector="DatePicker /template/ TextBlock#PART_MonthTextBlock">
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="TextAlignment" Value="Center" />
+	</Style>
+
+	<Style Selector="DatePicker /template/ TextBlock#PART_YearTextBlock">
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="TextAlignment" Value="Center" />
+	</Style>
+
+    <!-- Entrada numérica (NumericUpDown): mismo esquema de color que los inputs. -->
+    <Style Selector="NumericUpDown">
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+    </Style>
+
+    <!-- Casilla de verificación: texto en color principal (heredado del tema). -->
+    <Style Selector="CheckBox">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+
+    <!-- Ítem del desplegable (dropdown): texto en color principal. -->
+    <Style Selector="ComboBoxItem.DropDownItem">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+
+</Styles>

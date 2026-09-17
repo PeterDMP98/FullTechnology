@@ -1,0 +1,39 @@
+<!-- Cards.axaml — Estilos de tarjetas de estadísticas (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Tarjeta de estadística (spec §3.3.c): BgCard, 14px, padding 20 -->
+    <Style Selector="Border.StatCard">
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusCard}" />
+        <Setter Property="Padding" Value="{DynamicResource PaddingCard}" />
+    </Style>
+
+    <!-- Contenedor de ícono dentro de la tarjeta (fondo suave del color de estado) -->
+    <Style Selector="Border.StatIcon">
+        <Setter Property="Width" Value="44" />
+        <Setter Property="Height" Value="44" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+    </Style>
+
+    <!-- Número de tarjeta: 26 Bold (spec §2) -->
+    <Style Selector="TextBlock.StatNumber">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeStat}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+
+    <!-- Label de tarjeta: 13 gris -->
+    <Style Selector="TextBlock.StatLabel">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeSection}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+    </Style>
+
+    <!-- Barra inferior de color de la tarjeta: 3x70, esquinas 2 -->
+    <Style Selector="Border.StatBar">
+        <Setter Property="Height" Value="3" />
+        <Setter Property="Width" Value="70" />
+        <Setter Property="CornerRadius" Value="2" />
+    </Style>
+
+</Styles>

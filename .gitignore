@@ -1,0 +1,40 @@
+# Artefactos regenerables de .NET / Avalonia
+bin/
+obj/
+
+# Visual Studio / JetBrains Rider
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Carpetas de Intellisense de VS
+.vs/
+
+# Resultados de cobertura
+*.coverage
+*.coveragexml
+TestResults/
+
+# Logs y temporales
+*.log
+*.tmp
+Thumbs.db
+Desktop.ini
+
+# Salidas de los scripts de publicación/instalador (F13)
+installer/*.exe
+
+# Documentación de trabajo local (specs, notas, plan): no se publica.
+docs/
+
+# Bases de datos locales (se generan en tiempo de ejecución; las reales viven en %LOCALAPPDATA%)
+*.db
+*.sqlite
+*.sqlite3
+
+# Editores y extras por si aparecen
+.vscode/
+.DS_Store

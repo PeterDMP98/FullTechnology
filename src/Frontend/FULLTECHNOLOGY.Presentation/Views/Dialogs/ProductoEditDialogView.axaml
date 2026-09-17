@@ -1,0 +1,72 @@
+<!-- ProductoEditDialogView.axaml — Alta/edición de producto: datos de identificación, costos, proveedor, garantía y stock. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.ProductoEditDialogView"
+        x:DataType="vm:ProductoEditDialogViewModel"
+        Title="{Binding Title}"
+        Width="700" Height="640" MinWidth="620" MinHeight="560"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: Cancelar / Guardar con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Guardar" Click="OnSave" />
+            </StackPanel>
+        </Border>
+
+        <!-- Formulario desplazable: nombre, tipo, costos, proveedor, fecha de ingreso, garantía, ubicación y stock. -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="14"
+                  ColumnDefinitions="210,*">
+                <TextBlock Text="Nombre de producto *" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBox Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Nombre, Mode=TwoWay}" />
+
+                <TextBlock Grid.Row="1" Text="Tipo de producto" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <ComboBox Grid.Row="1" Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}"
+                          ItemsSource="{Binding TipoOptions}"
+                          SelectedItem="{Binding SelectedTipo}" />
+
+                <!-- Costos numéricos sin decimales (repuesto/venta). -->
+                <TextBlock Grid.Row="2" Text="Costo" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <NumericUpDown Grid.Row="2" Grid.Column="1" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="330"
+                               Minimum="0" Maximum="100000000000" Value="{Binding Costo, Mode=TwoWay}" />
+
+                <TextBlock Grid.Row="3" Text="Precio de venta" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <NumericUpDown Grid.Row="3" Grid.Column="1" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="330"
+                               Minimum="0" Maximum="100000000000" Value="{Binding PrecioVenta, Mode=TwoWay}" />
+
+                <!-- Proveedor: campo de texto con botón para buscar/crear proveedor mediante handler. -->
+                <TextBlock Grid.Row="4" Text="Proveedor" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <Grid Grid.Row="4" Grid.Column="1" ColumnDefinitions="*,78">
+                    <TextBox Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Proveedor, Mode=TwoWay}"
+                             PlaceholderText="Nombre del proveedor" />
+                    <Button Grid.Column="1" Classes="Secondary" Height="{DynamicResource HeightControl}" Margin="10,0,0,0"
+                            Content="Proveedor" Click="OnProveedorClick"
+                            ToolTip.Tip="Buscar o crear proveedor" />
+                </Grid>
+
+                <!-- Fecha de ingreso: solo lectura, calculada por el VM. -->
+                <TextBlock Grid.Row="5" Text="Fecha de ingreso" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding FechaIngresoLabel}"
+                           VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+
+                <TextBlock Grid.Row="6" Text="Tiempo de garantía" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBox Grid.Row="6" Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Garantia, Mode=TwoWay}" />
+
+                <TextBlock Grid.Row="7" Text="Ubicado" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBox Grid.Row="7" Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Ubicado, Mode=TwoWay}" />
+
+                <!-- Cantidad de stock con incremento de a 1. -->
+                <TextBlock Grid.Row="8" Text="Cantidad (stock)" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <NumericUpDown Grid.Row="8" Grid.Column="1" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="330"
+                               Minimum="0" Maximum="100000000000" Increment="1" Value="{Binding Stock, Mode=TwoWay}" />
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+
+</Window>

@@ -1,0 +1,44 @@
+<!-- Typography.axaml — Tokens de tipografía y tamaños de fuente (los recursos son tokens, NO se traducen). -->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Tipografía spec §2: Segoe UI con fallback a Inter (multiplataforma). -->
+    <!-- Fuente de la aplicación (se aplica globalmente vía Base.axaml); AppFontFamily es un alias equivalente. -->
+    <FontFamily x:Key="AppFontFamily">Segoe UI, Inter</FontFamily>
+    <FontFamily x:Key="FontFamily">Segoe UI, Inter</FontFamily>
+    <!-- Cuerpo base de texto (13). -->
+    <x:Double x:Key="FontSizeBody">13</x:Double>
+    <!-- Títulos (16). -->
+    <x:Double x:Key="FontSizeTitle">16</x:Double>
+    <!-- Textos de caption / subtítulos pequeños (11). -->
+    <x:Double x:Key="FontSizeCaption">11</x:Double>
+    <!-- Título de página (22). -->
+    <x:Double x:Key="FontSizePageTitle">22</x:Double>
+    <!-- Número de tarjeta de estadística (26). -->
+    <x:Double x:Key="FontSizeStat">26</x:Double>
+    <!-- Encabezados de sección (13). -->
+    <x:Double x:Key="FontSizeSection">13</x:Double>
+    <!-- Celdas de tabla (13). -->
+    <x:Double x:Key="FontSizeTable">13</x:Double>
+    <!-- Encabezados de tabla (12). -->
+    <x:Double x:Key="FontSizeTableHeader">12</x:Double>
+    <!-- Texto de botones (13). -->
+    <x:Double x:Key="FontSizeButton">13</x:Double>
+    <!-- Marca / nombre del negocio en el titlebar (18). -->
+    <x:Double x:Key="FontSizeBrand">18</x:Double>
+    <!-- Íconos y glifos de página (18). -->
+    <x:Double x:Key="FontSizeIcon">18</x:Double>
+    <!-- Subtítulos (12). -->
+    <x:Double x:Key="FontSizeSubtitle">12</x:Double>
+    <!-- Textos con presencia media: iconos de página, captions destacados (14). -->
+    <x:Double x:Key="FontSizeAccent">14</x:Double>
+    <!-- Título de tarjeta / sección de formulario (15). -->
+    <x:Double x:Key="FontSizeCardTitle">15</x:Double>
+    <!-- Destacados hero: letra de marca, nombre del negocio (20). -->
+    <x:Double x:Key="FontSizeHero">20</x:Double>
+    <!-- Glifo de la página en el cabezal del shell (24). -->
+    <x:Double x:Key="FontSizeGlyph">24</x:Double>
+    <!-- Título de vistas vacías / placeholder (28). -->
+    <x:Double x:Key="FontSizePlaceholder">28</x:Double>
+    <!-- Glifo de estado vacío (30). -->
+    <x:Double x:Key="FontSizeEmpty">30</x:Double>
+</ResourceDictionary>

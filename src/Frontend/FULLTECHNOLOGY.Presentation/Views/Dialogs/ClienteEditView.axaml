@@ -1,0 +1,35 @@
+<!-- ClienteEditView.axaml — Diálogo compacto de edición de cliente: nombre, documento y celular con botones Cancelar/Guardar. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.ClienteEditView"
+        x:DataType="vm:ClienteEditViewModel"
+        Title="{Binding Title}"
+        Width="560" Height="360" MinWidth="520" MinHeight="320"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: Cancelar / Guardar con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Guardar" Click="OnSave" />
+            </StackPanel>
+        </Border>
+
+        <!-- Formulario: tres campos obligatorios (nombre, documento, celular) enlazados en TwoWay. -->
+        <StackPanel Margin="24" Spacing="16">
+            <Grid ColumnDefinitions="190,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+                <TextBlock Text="Nombre *" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBox Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Nombre, Mode=TwoWay}" />
+                <TextBlock Grid.Row="1" Text="Documento de identidad *" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBox Grid.Column="1" Grid.Row="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Documento, Mode=TwoWay}" />
+                <TextBlock Grid.Row="2" Text="Número de Celular o WhatsApp *" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBox Grid.Column="1" Grid.Row="2" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Celular, Mode=TwoWay}" />
+            </Grid>
+        </StackPanel>
+    </DockPanel>
+
+</Window>

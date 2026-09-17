@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/Backend/">
+    <Project Path="src/Backend/FULLTECHNOLOGY.Application/FULLTECHNOLOGY.Application.csproj" />
+    <Project Path="src/Backend/FULLTECHNOLOGY.Domain/FULLTECHNOLOGY.Domain.csproj" />
+    <Project Path="src/Backend/FULLTECHNOLOGY.Infrastructure/FULLTECHNOLOGY.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Frontend/">
+    <Project Path="src/Frontend/FULLTECHNOLOGY.Presentation/FULLTECHNOLOGY.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FULLTECHNOLOGY.Application.Tests/FULLTECHNOLOGY.Application.Tests.csproj" />
+    <Project Path="tests/FULLTECHNOLOGY.Domain.Tests/FULLTECHNOLOGY.Domain.Tests.csproj" />
+    <Project Path="tests/FULLTECHNOLOGY.Presentation.Tests/FULLTECHNOLOGY.Presentation.Tests.csproj" />
+  </Folder>
+</Solution>

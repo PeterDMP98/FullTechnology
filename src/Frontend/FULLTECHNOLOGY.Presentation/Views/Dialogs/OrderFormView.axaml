@@ -1,0 +1,128 @@
+<!-- OrderFormView.axaml — Formulario de orden de reparación en 4 secciones: datos de cliente, dispositivo, diagnóstico/reparación y costo/entrega. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.OrderFormView"
+        x:DataType="vm:OrderFormViewModel"
+        Title="{Binding Title}"
+        Width="980" Height="820" MinWidth="900" MinHeight="620"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+
+        <!-- Barra de botones inferior -->
+        <!-- Pie del formulario: Cancelar / Guardar orden con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Guardar orden" Click="OnSave" />
+            </StackPanel>
+        </Border>
+
+        <!-- Formulario desplazable con las secciones numeradas y resumen de totales. -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24" Spacing="16">
+
+                <!-- ========== 01. DATOS DE CLIENTE ========== -->
+                <!-- Sección 01: nombre (con atajo "Crear cliente"), documento (con "Buscar cliente") y celular. -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="01. Datos de cliente" />
+                <Grid ColumnDefinitions="190,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+                    <TextBlock Text="Nombre *" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Nombre, Mode=TwoWay}" />
+                    <Button Grid.Column="2" Classes="Secondary" Height="{DynamicResource HeightControl}" Content="Crear cliente"
+                            Command="{Binding CrearClienteCommand}" />
+                    <TextBlock Grid.Row="1" Text="Documento de identidad" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Grid.Row="1" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Documento, Mode=TwoWay}" />
+                    <Button Grid.Column="2" Grid.Row="1" Classes="Secondary" Height="{DynamicResource HeightControl}" Content="Buscar cliente"
+                            Command="{Binding BuscarClienteCommand}" />
+                    <TextBlock Grid.Row="2" Text="Número de Celular o WhatsApp" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Celular, Mode=TwoWay}" />
+                </Grid>
+
+                <!-- ========== 02. DISPOSITIVO ========== -->
+                <!-- Sección 02: tipo de equipo, marca, modelo, IMEI/serial, color y accesorios de entrada. -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="02. Dispositivo" />
+                <Grid ColumnDefinitions="190,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
+                    <TextBlock Text="Tipo de Equipo *" VerticalAlignment="Center" />
+                    <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                              ItemsSource="{Binding TiposEquipo}" SelectedItem="{Binding TipoEquipo, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="1" Text="Marca *" VerticalAlignment="Center" />
+                    <ComboBox Grid.Column="1" Grid.Row="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                              ItemsSource="{Binding Marcas}" SelectedItem="{Binding Marca, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="2" Text="Modelo" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Modelo, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="3" Text="IMEI / Serial" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="3" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding SerialImei, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="4" Text="Color" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="4" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Color, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="5" Text="Accesorios con el que entra" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="5" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Accesorios, Mode=TwoWay}" />
+                </Grid>
+
+                <!-- ========== 03. DIAGNÓSTICO Y REPARACIÓN ========== -->
+                <!-- Sección 03: estado físico, diagnóstico, trabajo realizado y observaciones (multilínea). -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="03. Diagnóstico y reparación" />
+                <Grid ColumnDefinitions="190,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="14">
+                    <TextBlock Text="Estado Físico *" VerticalAlignment="Center" />
+                    <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                              ItemsSource="{Binding Condiciones}" SelectedItem="{Binding CondicionFisica, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="1" Text="Diagnóstico" VerticalAlignment="Top" Margin="0,8,0,0" />
+                    <TextBox Grid.Column="1" Grid.Row="1" Classes="Input" Height="84" AcceptsReturn="True" TextWrapping="Wrap"
+                             Text="{Binding Diagnostico, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="2" Text="Trabajo realizado" VerticalAlignment="Top" Margin="0,8,0,0" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Classes="Input" Height="84" AcceptsReturn="True" TextWrapping="Wrap"
+                             Text="{Binding TrabajoRealizado, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="3" Text="Observaciones" VerticalAlignment="Top" Margin="0,8,0,0" />
+                    <TextBox Grid.Column="1" Grid.Row="3" Classes="Input" Height="84" AcceptsReturn="True" TextWrapping="Wrap"
+                             Text="{Binding Observaciones, Mode=TwoWay}" />
+                </Grid>
+
+                <!-- ========== 04. COSTO Y ENTREGA ========== -->
+                <!-- Sección 04a: estado de entrega y forma de pago. -->
+                <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="04. Costo y entrega" />
+
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="190,*" ColumnSpacing="12">
+                        <TextBlock Text="Estado de entrega" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                                  ItemsSource="{Binding Estados}" SelectedItem="{Binding Estado, Mode=TwoWay}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="190,*" ColumnSpacing="12">
+                        <TextBlock Text="Forma de pago" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                                  ItemsSource="{Binding MediosPago}" SelectedItem="{Binding FormaPago, Mode=TwoWay}" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- Sección 04b: desglose de coste (repuesto, mano de obra, abono, descuento, diagnóstico). -->
+                <TextBlock FontSize="{DynamicResource FontSizeAccent}" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Text="▪ Coste" />
+                <Grid ColumnDefinitions="190,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
+                    <TextBlock Text="Repuesto" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Value="{Binding Repuesto, Mode=TwoWay}" Minimum="0" Maximum="100000000000"
+                                   FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                    <TextBlock Grid.Row="1" Text="Mano de obra" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Grid.Row="1" Value="{Binding ManoObra, Mode=TwoWay}" Minimum="0"
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                    <TextBlock Grid.Row="2" Text="Abono" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Grid.Row="2" Value="{Binding Abono, Mode=TwoWay}" Minimum="0"
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                    <TextBlock Grid.Row="3" Text="Descuento" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Grid.Row="3" Value="{Binding Descuento, Mode=TwoWay}" Minimum="0"
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                    <TextBlock Grid.Row="4" Text="Diagnóstico" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Grid.Row="4" Value="{Binding CostoDiagnostico, Mode=TwoWay}" Minimum="0"
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                </Grid>
+
+                <!-- Total y saldo resumidos por el VM (total en rojo de peligro; saldo en secundario). -->
+                <StackPanel Orientation="Horizontal" Spacing="24">
+                    <TextBlock Text="{Binding TotalLabel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource DangerBadge}" />
+                    <TextBlock Text="{Binding SaldoLabel}" FontSize="{DynamicResource FontSizeAccent}" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+
+</Window>

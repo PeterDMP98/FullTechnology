@@ -1,0 +1,20 @@
+<!-- PlaceholderView.axaml — Vista placeholder: muestra título y descripción centrados para módulos en construcción. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+             x:Class="FULLTECHNOLOGY.Presentation.Views.PlaceholderView"
+             x:DataType="vm:PlaceholderViewModel">
+
+    <!-- Bloque central: título grande (28 Bold) y descripción ajustable, ambos desde el ViewModel.
+         Se usa como contenido temporal de un módulo no implementado. -->
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+        <TextBlock Text="{Binding Title}"
+                   FontSize="{DynamicResource FontSizePlaceholder}" FontWeight="Bold"
+                   HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding Description}"
+                   FontSize="{DynamicResource FontSizeAccent}" TextWrapping="Wrap"
+                   MaxWidth="480" TextAlignment="Center"
+                   HorizontalAlignment="Center" />
+    </StackPanel>
+
+</UserControl>

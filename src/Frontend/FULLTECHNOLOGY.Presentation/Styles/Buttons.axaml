@@ -1,0 +1,101 @@
+<!-- Buttons.axaml — Estilos de botones del Design System (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Transición base de hover (F11): el cambio de color de los botones
+         es sutil (120 ms) y uniforme en toda la app (spec §25). -->
+    <Style Selector="Button">
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12" />
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <!-- Botón principal · CornerRadius 10 · AccentPrimary (spec §3.3.b) -->
+    <Style Selector="Button.Primary">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeButton}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="{DynamicResource PaddingButton}" />
+    </Style>
+    <!-- Hover del botón primario: acento más claro. -->
+    <Style Selector="Button.Primary:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentPrimaryLight}" />
+    </Style>
+
+    <!-- Botón secundario: igual tamaño, fondo neutro + borde -->
+    <Style Selector="Button.Secondary">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeButton}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="{DynamicResource PaddingButton}" />
+    </Style>
+
+    <!-- Botón circular de topbar 36x36 (luna, campana, avatar) spec §3.1 -->
+    <Style Selector="Button.Circular">
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusCircle}" />
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Botón pequeño de tabla "Ver" 78x32 spec §3.3.d -->
+    <Style Selector="Button.Table">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusTableButton}" />
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryLight}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="12,0" />
+    </Style>
+
+    <!-- Botón de paginación activo 28x28 -->
+    <Style Selector="Button.Page">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusTableButton}" />
+        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <!-- Página actual del paginador: fondo de acento. Se activa con {StaticResource PageActive} (solo existe local en MantenimientoView). -->
+    <Style Selector="Button.Page.active">
+        <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+
+    <!-- Botones de control de ventana del titlebar custom 46x62 (spec §5.1) -->
+    <Style Selector="Button.WindowControl">
+        <Setter Property="Width" Value="46" />
+        <Setter Property="Height" Value="62" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <!-- Hover genérico de los controles de ventana. -->
+    <Style Selector="Button.WindowControl:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource BgRowAlt}" />
+    </Style>
+    <!-- Hover del botón cerrar: fondo rojo de peligro (DangerBadge). -->
+    <Style Selector="Button.WindowControl.close:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource DangerBadge}" />
+    </Style>
+
+</Styles>

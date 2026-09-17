@@ -1,0 +1,32 @@
+<!-- Dialogs.axaml — Estilos de ventanas de diálogo (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Diálogo de la app (spec §3.3.e): 480x250, BgApp, radio 12 -->
+    <!-- Clase "Dialog" sobre Window: define el fondo y ajusta el tamaño al contenido (ancho y alto). -->
+    <Style Selector="Window.Dialog">
+        <Setter Property="Background" Value="{DynamicResource BgApp}" />
+        <Setter Property="SizeToContent" Value="WidthAndHeight" />
+    </Style>
+
+    <!-- Título de diálogo: 16px bold en color principal. -->
+    <Style Selector="TextBlock.DialogTitle">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeTitle}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+
+    <!-- Cuerpo de mensaje del diálogo: 13px, secundario y con ajuste de línea. -->
+    <Style Selector="TextBlock.DialogBody">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- Pie del diálogo: contenedor horizontal de los botones de acción, estirado a todo el ancho. -->
+    <Style Selector="Border.DialogFooter">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="{DynamicResource PaddingDialogFooter}" />
+    </Style>
+
+</Styles>

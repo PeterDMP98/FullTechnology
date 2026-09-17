@@ -1,0 +1,190 @@
+<!-- InventarioView.axaml — Módulo de inventario/productos: toolbar de filtros, tabla de productos con estados de carga/error/vacío y pie resumen. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+             xmlns:vmm="using:FULLTECHNOLOGY.Presentation.ViewModels.Inventario"
+             xmlns:auto="using:Avalonia.Automation"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+             x:Class="FULLTECHNOLOGY.Presentation.Views.InventarioView"
+             x:DataType="vm:InventarioViewModel">
+
+    <!-- Layout vertical: fila toolbar → tabla (*) → pie de resumen. -->
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="20">
+
+        <!-- ===================== TOOLBAR ===================== -->
+        <!-- Barra superior: botón "+ Nuevo producto", combo de tipo y buscador con lupa. -->
+        <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="12" Height="{DynamicResource HeightToolbar}">
+            <Button Classes="Primary" Content="+ Nuevo producto"
+                    Command="{Binding NuevoProductoCommand}"
+                    HorizontalAlignment="Left" VerticalAlignment="Center" />
+
+            <!-- Combo de tipo de producto (patrón Auto,*,Auto,*: solo ocupa lo necesario) -->
+            <!-- Filtro por Tipo del producto; opciones y selección desde el VM. -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock Text="Tipo:" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                <ComboBox Classes="Filter" Width="120" Height="{DynamicResource HeightToolbar}"
+                          ItemsSource="{Binding TipoOptions}"
+                          SelectedItem="{Binding SelectedTipo}" />
+            </StackPanel>
+
+            <!-- Buscador con lupa (búsqueda en vivo) -->
+            <!-- Búsqueda en vivo por nombre, código o proveedor; la lupa (⌕) es decorativa. -->
+            <Grid Grid.Column="3" Height="{DynamicResource HeightToolbar}">
+                <TextBox Classes="Input" Height="{DynamicResource HeightToolbar}" Padding="{DynamicResource PaddingInputIcon}"
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         PlaceholderText="Nombre, código o proveedor..." />
+                <TextBlock Text="&#x2315;" FontSize="{DynamicResource FontSizeIcon}" Foreground="{DynamicResource TextSecondary}"
+                           HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Margin="0,0,14,0" IsHitTestVisible="False" />
+            </Grid>
+        </Grid>
+
+        <!-- ===================== TABLA ===================== -->
+        <!-- Tarjeta de tabla: header de columnas + cuerpo con scroll y overlays de estado. -->
+        <Border Grid.Row="1" Background="{DynamicResource BgCard}"
+                CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
+            <!-- Un solo ScrollViewer horizontal mantiene header + filas alineados (TreeDataGrid #256) -->
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <Grid MinWidth="940" RowDefinitions="Auto,*">
+
+                    <!-- Header de columnas -->
+                    <!-- Columnas alineadas: código, nombre, tipo (centro), costos (derecha), stock (centro) y opciones. -->
+                    <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
+                        <Grid>
+<Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="*" MinWidth="120" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" MinWidth="120" />
+                            <ColumnDefinition Width="95" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Classes="TableHeader" Text="Código" />
+                        <TextBlock Grid.Column="1" Classes="TableHeader" Text="Nombre" />
+                        <TextBlock Grid.Column="2" Classes="TableHeader" Text="Tipo" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Classes="TableHeader" Text="Costo" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="4" Classes="TableHeader" Text="Precio venta" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="5" Classes="TableHeader" Text="Proveedor" />
+                        <TextBlock Grid.Column="6" Classes="TableHeader" Text="Ingreso" />
+                        <TextBlock Grid.Column="7" Classes="TableHeader" Text="Garantía" />
+                        <TextBlock Grid.Column="8" Classes="TableHeader" Text="Ubicado" />
+                        <TextBlock Grid.Column="9" Classes="TableHeader" Text="Stock" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Column="10" Classes="TableHeader" Text="Opciones" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Cuerpo: filas + estados vacío/cargando -->
+                    <!-- Capa de filas: ItemsControl con scroll vertical; el botón de acciones (⋯) se resuelve en code-behind. -->
+                    <Grid Grid.Row="1">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Rows}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vmm:ProductoRowViewModel">
+                                        <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
+                                            <Grid>
+<Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="*" MinWidth="120" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="*" MinWidth="120" />
+                                                <ColumnDefinition Width="95" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="70" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Codigo}" Classes="TableCell"
+                                                       Foreground="{DynamicResource AccentPrimaryLight}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Nombre}" Classes="TableCell" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Nombre}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Tipo}" Classes="TableCell"
+                                                       HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="3" Text="{Binding Costo}" Classes="TableCell"
+                                                       HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="4" Text="{Binding PrecioVenta}" Classes="TableCell"
+                                                       HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="5" Text="{Binding Proveedor}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Proveedor}" />
+                                            <TextBlock Grid.Column="6" Text="{Binding Ingreso}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="7" Text="{Binding Garantia}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="8" Text="{Binding Ubicado}" Classes="TableCell"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="9" Text="{Binding Stock}" Classes="TableCell"
+                                                       HorizontalAlignment="Center" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Grid.Column="10" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <!-- Botón de acciones sin texto (⋯): menú vía code-behind, accesible por AutomationProperties. -->
+                                                <Button Classes="Table" Width="44" Content="&#x22EF;"
+                                                        Click="OnOptionsClick" ToolTip.Tip="Acciones del producto"
+                                                        auto:AutomationProperties.Name="Acciones del producto" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Estado: cargando -->
+                    <!-- Overlay con ProgressBar mientras IsLoading. -->
+                    <Border Classes="LoadingOverlay" IsVisible="{Binding IsLoading}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                            <ProgressBar Width="180" IsIndeterminate="True" />
+                            <TextBlock Text="Cargando productos..." Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Estado: error de carga (mensaje amigable + reintento) -->
+                    <!-- Overlay de error (opacidad alta): glifo ⚠, título, mensaje del VM y Reintentar. -->
+                    <Border Classes="LoadingOverlay error" IsVisible="{Binding IsError}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" MaxWidth="480">
+                            <TextBlock Classes="StateGlyph StateGlyphError" Text="&#x26A0;" />
+                            <TextBlock Classes="StateTitle" Text="No se pudieron cargar los productos" />
+                            <TextBlock Classes="StateBody" Text="{Binding ErrorMessage}" />
+                            <Button Classes="Secondary" Content="Reintentar" Command="{Binding RetryCommand}"
+                                    HorizontalAlignment="Center" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Estado: vacío -->
+                    <!-- Mensaje central cuando no hay productos con los filtros actuales (IsEmpty). -->
+                    <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                        <TextBlock Classes="StateGlyph" Text="&#x25A4;" />
+                        <TextBlock Classes="StateBody" Text="No se encontraron productos con los filtros actuales." />
+                    </StackPanel>
+                </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ===================== PIE ===================== -->
+        <!-- Pie: total de productos y tipo seleccionado. -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Foreground="{DynamicResource TextSecondary}">Productos:</TextBlock>
+                <TextBlock Text="{Binding TotalRows}" VerticalAlignment="Center" />
+                <TextBlock Foreground="{DynamicResource TextSecondary}">·</TextBlock>
+                <TextBlock Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center">Tipo:</TextBlock>
+                <TextBlock Text="{Binding SelectedTipo}" VerticalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+
+</UserControl>

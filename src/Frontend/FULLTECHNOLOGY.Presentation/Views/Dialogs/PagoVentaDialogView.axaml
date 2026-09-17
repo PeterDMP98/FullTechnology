@@ -1,0 +1,38 @@
+<!-- PagoVentaDialogView.axaml — Diálogo de venta para seleccionar el medio de pago y mostrar el total a cobrar. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.PagoVentaDialogView"
+        x:DataType="vm:PagoVentaDialogViewModel"
+        Title="Medio de pago"
+        Width="420" Height="250" MinWidth="380" MinHeight="230"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: Cancelar / Aceptar con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Aceptar" Click="OnAceptar" />
+            </StackPanel>
+        </Border>
+
+        <!-- Resumen del cobro: total a pagar (en acento) y selección de medio de pago. -->
+        <StackPanel Margin="24" Spacing="16" VerticalAlignment="Center">
+            <Grid ColumnDefinitions="120,*">
+                <TextBlock Text="Total a pagar:" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontSize="{DynamicResource FontSizeTitle}"
+                           FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}" VerticalAlignment="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="120,*">
+                <TextBlock Text="Medio de pago:" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                <ComboBox Grid.Column="1" Classes="Input" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="220"
+                          ItemsSource="{Binding MetodoOptions}"
+                          SelectedItem="{Binding SelectedMetodo}" />
+            </Grid>
+        </StackPanel>
+    </DockPanel>
+
+</Window>

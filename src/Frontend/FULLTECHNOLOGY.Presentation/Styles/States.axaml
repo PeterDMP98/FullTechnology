@@ -1,0 +1,62 @@
+<!-- States.axaml — Overlays de carga/error/vacío y accesibilidad por teclado (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Overlay de carga/error (F12): ocupa el área de tabla mientras IsLoading o IsError.
+         Variante `error` sube la opacidad para leer el mensaje con claridad. -->
+    <Style Selector="Border.LoadingOverlay">
+        <Setter Property="Background" Value="{DynamicResource BgApp}" />
+        <Setter Property="Opacity" Value="0.6" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusCard}" />
+    </Style>
+    <Style Selector="Border.LoadingOverlay.error">
+        <Setter Property="Opacity" Value="0.92" />
+    </Style>
+
+    <!-- Tipografía común de los estados (EmptyState / ErrorState / Loading): glifo, título, cuerpo -->
+    <!-- Glifo de estado (ícono grande, ej. ⚠ ◧ ▤): centrado y en color secundario. -->
+    <Style Selector="TextBlock.StateGlyph">
+        <Setter Property="FontSize" Value="34" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+    </Style>
+    <!-- Variante de glifo para errores: en rojo de peligro (DangerBadge). -->
+    <Style Selector="TextBlock.StateGlyphError">
+        <Setter Property="Foreground" Value="{DynamicResource DangerBadge}" />
+    </Style>
+    <!-- Título del estado (ej. "No se pudieron cargar las órdenes"): 15px semibold, centrado. -->
+    <Style Selector="TextBlock.StateTitle">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <!-- Cuerpo descriptivo del estado: 12px secundario, centrado y con máximo de 440px para legibilidad. -->
+    <Style Selector="TextBlock.StateBody">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="MaxWidth" Value="440" />
+    </Style>
+
+    <!-- Accesibilidad (F12): anillo de foco visible con teclado en inputs (Tab) -->
+    <!-- Al navegar con teclado (focus-visible), los inputs muestran borde de acento 1.5px. -->
+    <Style Selector="TextBox.Input:focus-visible">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+    </Style>
+    <Style Selector="ComboBox.Filter:focus-visible">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+    </Style>
+    <Style Selector="DatePicker:focus-visible">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+    </Style>
+    <Style Selector="NumericUpDown:focus-visible">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+    </Style>
+
+</Styles>

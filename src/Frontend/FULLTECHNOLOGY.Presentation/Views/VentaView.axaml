@@ -1,0 +1,288 @@
+<!-- VentaView.axaml — Punto de venta de accesorios: catálogo de productos con búsqueda y carrito lateral con totales y cobro. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+             xmlns:vmm="using:FULLTECHNOLOGY.Presentation.ViewModels.Venta"
+             xmlns:dc="using:Avalonia.Data.Converters"
+             xmlns:auto="using:Avalonia.Automation"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
+             x:Class="FULLTECHNOLOGY.Presentation.Views.VentaView"
+             x:DataType="vm:VentaViewModel">
+
+    <UserControl.Resources>
+        <!-- Tarjeta del carrito: línea 1 producto|cant.|precio ; línea 2 Total + − + ✕ -->
+        <!-- Plantilla de ítem del carrito: línea 1 (nombre, cantidad, precio unitario) y línea 2 (total +
+             botones −/+/✕ con glifos unicode y AutomationProperties + ToolTip para accesibilidad). -->
+        <DataTemplate x:Key="CartCardTemplate" x:DataType="vmm:CartItemViewModel">
+            <Border Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}"
+                    Margin="0,0,0,8" Padding="12,8,12,8" Height="72">
+                <Grid RowDefinitions="Auto,Auto">
+                    <Grid ColumnDefinitions="*,30,86">
+                        <TextBlock Text="{Binding Nombre}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="{Binding Cantidad}" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Text="{Binding PrecioUnitario}" FontWeight="SemiBold"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AccentPrimaryLight}" />
+                    </Grid>
+                    <Grid Grid.Row="1" ColumnDefinitions="*,84,32,32,32" Margin="0,4,0,0">
+                        <TextBlock Text="{Binding Total}" Foreground="{DynamicResource TextSecondary}" FontWeight="SemiBold"
+                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <!-- Botón − : quita una unidad (Command); glifo unicode 2212, accesible. -->
+                        <Button Grid.Column="1" Classes="Table" Content="&#x2212;" Command="{Binding MenosCommand}"
+                                MinWidth="26" Height="32" HorizontalAlignment="Stretch"
+                                ToolTip.Tip="Quitar uno" auto:AutomationProperties.Name="Quitar uno" />
+                        <!-- Botón + : añade una unidad más. -->
+                        <Button Grid.Column="2" Classes="Table" Content="+" Command="{Binding MasCommand}"
+                                MinWidth="26" Height="32" HorizontalAlignment="Stretch" Margin="3,0,0,0"
+                                ToolTip.Tip="Añadir uno más" auto:AutomationProperties.Name="Añadir uno más" />
+                        <!-- Botón ✕ : elimina el ítem del carrito. -->
+                        <Button Grid.Column="3" Classes="Table" Content="&#x2715;" Command="{Binding QuitarCommand}"
+                                MinWidth="26" Height="32" HorizontalAlignment="Stretch" Margin="3,0,0,0"
+                                ToolTip.Tip="Quitar del carrito" auto:AutomationProperties.Name="Quitar del carrito" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!-- Layout de 2 columnas: columna principal de catálogo (*) y panel lateral del carrito (fluido 340-420px). -->
+    <Grid ColumnDefinitions="*,Auto">
+
+        <!-- ===================== COLUMNA PRINCIPAL ===================== -->
+        <!-- Columna del catálogo: toolbar, tabla de accesorios y pie informativo. -->
+        <Grid RowDefinitions="46,*,42" RowSpacing="14">
+
+            <!-- Toolbar -->
+            <!-- Barra superior: buscador en vivo (crece), selección de cliente opcional y nombre del cliente (patrón *,Auto,Auto). -->
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Height="{DynamicResource HeightToolbar}">
+                <!-- Buscador con lupa (búsqueda en vivo) -->
+                <Grid>
+<TextBox Classes="Input" Height="{DynamicResource HeightToolbar}" Padding="{DynamicResource PaddingInputIcon}"
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         PlaceholderText="Buscar producto..." />
+                    <TextBlock Text="&#x2315;" FontSize="{DynamicResource FontSizeIcon}" Foreground="{DynamicResource TextSecondary}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center"
+                               Margin="0,0,14,0" IsHitTestVisible="False" />
+                </Grid>
+
+                <!-- Botón para abrir el diálogo de selección de cliente. -->
+                <Button Grid.Column="1" Classes="Secondary" Height="{DynamicResource HeightToolbar}" MinWidth="200"
+                        Content="Seleccionar cliente (opcional)"
+                        Command="{Binding SeleccionarClienteCommand}" HorizontalAlignment="Stretch" />
+
+                <!-- Nombre del cliente seleccionado; TargetNullValue muestra el texto por defecto si es nulo. -->
+                <TextBlock Grid.Column="2" MinWidth="160" Foreground="{DynamicResource StatusSuccess}" FontWeight="SemiBold"
+                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                           Text="{Binding ClienteNombre, TargetNullValue='Cliente no seleccionado'}" />
+            </Grid>
+
+            <!-- Listado de productos (accesorios) -->
+            <!-- Tarjeta de catálogo: header de columnas + filas de productos con botón "Agregar".
+                 Un solo ScrollViewer horizontal mantiene header + filas alineados (TreeDataGrid #256). -->
+            <Border Grid.Row="1" Background="{DynamicResource BgCard}"
+                    CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <Grid MinWidth="620" RowDefinitions="Auto,*">
+
+                    <!-- Header de columnas del catálogo. -->
+                    <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
+                        <Grid>
+<Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="*" MinWidth="140" />
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Classes="TableHeader" Text="Código" />
+                        <TextBlock Grid.Column="1" Classes="TableHeader" Text="Nombre" />
+                        <TextBlock Grid.Column="2" Classes="TableHeader" Text="Ubicado" />
+                        <TextBlock Grid.Column="3" Classes="TableHeader" Text="Costo" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="4" Classes="TableHeader" Text="Precio venta" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="5" Classes="TableHeader" Text="Stock" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Column="6" Classes="TableHeader" Text="Garantía" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="7" Classes="TableHeader" Text="Agregar" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="1">
+                        <!-- Fila del producto: celdas + botón "Agregar" (glifo +) que añade al carrito. -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Rows}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vmm:ProductoVentaRowViewModel">
+                                        <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
+                                            <Grid>
+<Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="70" />
+                                                <ColumnDefinition Width="*" MinWidth="140" />
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="70" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="60" />
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Classes="TableCell" Text="{Binding Codigo}"
+                                                       Foreground="{DynamicResource AccentPrimaryLight}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Classes="TableCell" Text="{Binding Nombre}" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Nombre}" />
+                                            <TextBlock Grid.Column="2" Classes="TableCell" Text="{Binding Ubicado}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="3" Classes="TableCell" Text="{Binding Costo}"
+                                                       HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="4" Classes="TableCell" Text="{Binding PrecioVenta}"
+                                                       HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="5" Classes="TableCell" Text="{Binding Stock}" FontWeight="SemiBold"
+                                                       HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="6" Classes="TableCell" Text="{Binding Garantia}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <!-- Botón "Agregar": con glifo "+" y texto, dispara AgregarCommand (accesible). -->
+                                            <Button Grid.Column="7" Classes="Primary" Command="{Binding AgregarCommand}"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Center"
+													HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                                    Height="30" MinWidth="88" Margin="0,2,0,2" Padding="0,2,0,2"
+                                                    ToolTip.Tip="Agregar al carrito" auto:AutomationProperties.Name="Agregar al carrito">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <TextBlock Text="&#x2B;" FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold"  VerticalAlignment="Center"/>
+                                                        <TextBlock Text="Agregar" FontSize="{DynamicResource FontSizeButton}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                        <!-- Estado: cargando -->
+                        <!-- Overlay con ProgressBar mientras IsLoading. -->
+                        <Border Classes="LoadingOverlay" IsVisible="{Binding IsLoading}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                <ProgressBar Width="180" IsIndeterminate="True" />
+                                <TextBlock Text="Cargando productos..." Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Estado: error de carga (mensaje amigable + reintento) -->
+                        <!-- Overlay de error (opacidad alta): glifo ⚠, título, mensaje del VM y Reintentar. -->
+                        <Border Classes="LoadingOverlay error" IsVisible="{Binding IsError}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" MaxWidth="480">
+                                <TextBlock Classes="StateGlyph StateGlyphError" Text="&#x26A0;" />
+                                <TextBlock Classes="StateTitle" Text="No se pudo cargar el catálogo de accesorios" />
+                                <TextBlock Classes="StateBody" Text="{Binding ErrorMessage}" />
+                                <Button Classes="Secondary" Content="Reintentar" Command="{Binding RetryCommand}"
+                                        HorizontalAlignment="Center" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Estado: vacío -->
+                        <!-- Mensaje central cuando no hay productos con los filtros actuales (IsEmpty). -->
+                        <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                            <TextBlock Classes="StateGlyph" Text="&#x25A4;" />
+                            <TextBlock Classes="StateBody" Text="No se encontraron accesorios para la venta." />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Pie -->
+            <!-- Pie del catálogo: cuenta de accesorios encontrados y nota de uso. -->
+            <Border Grid.Row="2" Padding="2,10,2,2">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Foreground="{DynamicResource TextSecondary}">Accesorios:</TextBlock>
+                    <TextBlock Text="{Binding ProductsCount}" VerticalAlignment="Center" />
+                    <TextBlock Foreground="{DynamicResource TextSecondary}">·</TextBlock>
+                    <TextBlock Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center">Busca y usa 'Agregar' para armar el carrito</TextBlock>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ===================== CARRITO (panel lateral a todo el alto) ===================== -->
+        <!-- Panel lateral del carrito: fluido (340-420px), header "CARRO", lista de ítems (o vacío) y zona fija de totales. -->
+        <Border Grid.Column="1" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="1,0,0,0"
+                MinWidth="340" MaxWidth="420">
+            <Grid RowDefinitions="44,*,Auto">
+
+                <!-- Header CARRO -->
+                <Border Background="{DynamicResource AccentPrimary}">
+                    <TextBlock Text="CARRO" Foreground="White" FontWeight="Bold" FontSize="{DynamicResource FontSizeTitle}"
+                               VerticalAlignment="Center" Margin="16,0,0,0" />
+                </Border>
+
+                <!-- Lista de ítems (o vacío) -->
+                <!-- Lista con la plantilla CartCardTemplate; si no hay ítems se muestra el estado vacío
+                     (convertidor BoolConverters.Not sobre HasCartItems). -->
+                <Grid Grid.Row="1">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding CartItems}"
+                                      ItemTemplate="{StaticResource CartCardTemplate}"
+                                      Margin="10,10,10,0" />
+                    </ScrollViewer>
+
+                    <StackPanel IsVisible="{Binding HasCartItems, Converter={x:Static dc:BoolConverters.Not}}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Margin="16">
+                        <TextBlock Text="&#x25A4;" FontSize="{DynamicResource FontSizeEmpty}" HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+                        <TextBlock Text="El carrito está vacío.&#x0a;Usa 'Agregar' en la lista de productos."
+                                   Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" TextAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Zona de totales (fija abajo) -->
+                <!-- Pie del carrito: resumen de ítems, descuento opcional (CheckBox + NumericUpDown),
+                     banner de "Total a cobrar" en StatusSuccess y botones Cancelar / Compra. -->
+                <Border Grid.Row="2" Background="{DynamicResource BgSidebar}"
+                        BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+                    <StackPanel Margin="16,12,16,12" Spacing="12">
+                        <TextBlock Text="{Binding ItemsText}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}"
+                                   HorizontalAlignment="Center" />
+
+                        <Grid ColumnDefinitions="Auto,*,150">
+                            <!-- Descuento: se activa con el CheckBox y habilita el NumericUpDown del valor. -->
+                            <CheckBox IsChecked="{Binding DescuentoActivo, Mode=TwoWay}"
+                                      Content="Descuento" VerticalAlignment="Center"
+                                      Foreground="{DynamicResource TextPrimary}" />
+                            <NumericUpDown Grid.Column="2" Height="{DynamicResource HeightControl}"
+                                           Minimum="0" Maximum="100000000000"
+                                           IsEnabled="{Binding DescuentoActivo}"
+                                           Value="{Binding DescuentoValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+
+                        <!-- Banner verde con el total a cobrar. -->
+                        <Border Background="{DynamicResource StatusSuccess}" CornerRadius="{DynamicResource RadiusCard}" Height="54">
+                            <Grid ColumnDefinitions="*,Auto" Margin="14,0">
+                                <TextBlock Text="Total a cobrar:" VerticalAlignment="Center" Foreground="White" FontWeight="SemiBold" />
+                                <TextBlock Grid.Column="1" Text="{Binding TotalText}" VerticalAlignment="Center"
+                                           Foreground="White" FontWeight="Bold" FontSize="{DynamicResource FontSizeTitle}" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Acciones finales: cancelar la venta o confirmar la compra. -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0" Classes="Secondary" Content="Cancelar" Height="{DynamicResource HeightControl}"
+                                    Command="{Binding CancelarVentaCommand}" />
+                            <Button Grid.Column="1" Classes="Primary" Content="Compra" Height="{DynamicResource HeightControl}"
+                                    Command="{Binding ComprarCommand}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+
+</UserControl>

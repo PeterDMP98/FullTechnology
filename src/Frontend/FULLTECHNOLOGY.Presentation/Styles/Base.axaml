@@ -1,0 +1,35 @@
+<!-- Base.axaml — Punto de entrada de los estilos del Design System (los recursos son tokens, NO se traducen). -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Tokens de tipografía y spacing expuestos como recursos globales -->
+    <Styles.Resources>
+        <ResourceDictionary>
+            <!-- Fusiona los diccionarios de tokens tipográficos (Typographía) y de espaciado/radios (Spacing). -->
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Typography.axaml" />
+                <MergeResourceInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Spacing.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <!-- Estilos del Design System -->
+    <!-- Importa en orden: botones, inputs, tarjetas, badges/pills, tablas, navegación, diálogos y estados/overlays. -->
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Buttons.axaml" />
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Inputs.axaml" />
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Cards.axaml" />
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Badges.axaml" />
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Tables.axaml" />
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Navigation.axaml" />
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/Dialogs.axaml" />
+    <StyleInclude Source="avares://FULLTECHNOLOGY.Presentation/Styles/States.axaml" />
+
+    <!-- Texto por defecto: fuente + tamaño base (spec §2) -->
+    <!-- Estilo global de TextBlock: aplica la fuente y el tamaño base del token, con el color de texto principal. -->
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="{DynamicResource FontFamily}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+
+</Styles>

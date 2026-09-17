@@ -1,0 +1,46 @@
+<!-- Spacing.axaml — Tokens de medida (los recursos son tokens, NO se traducen). -->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Escala base 8pt / múltiplos de 4 (Material 3, Apple HIG). -->
+    <x:Double x:Key="Space2">2</x:Double>
+    <x:Double x:Key="Space4">4</x:Double>
+    <x:Double x:Key="Space8">8</x:Double>
+    <x:Double x:Key="Space12">12</x:Double>
+    <x:Double x:Key="Space16">16</x:Double>
+    <x:Double x:Key="Space20">20</x:Double>
+    <x:Double x:Key="Space24">24</x:Double>
+    <x:Double x:Key="Space32">32</x:Double>
+    <x:Double x:Key="Space40">40</x:Double>
+    <x:Double x:Key="Space48">48</x:Double>
+
+    <!-- Alturas de componente (Carbon: control 40, sidebar nav 40-44, fila tabla 44-48). -->
+    <x:Double x:Key="HeightToolbar">40</x:Double>
+    <x:Double x:Key="HeightControl">40</x:Double>
+    <x:Double x:Key="HeightTableHeader">40</x:Double>
+    <x:Double x:Key="HeightTableRow">46</x:Double>
+
+    <!-- Paddings semánticos (8pt grid). -->
+    <Thickness x:Key="PaddingPage">40,32,40,32</Thickness>
+    <Thickness x:Key="PaddingPageCompact">24</Thickness>
+    <Thickness x:Key="PaddingCard">20</Thickness>
+    <Thickness x:Key="PaddingButton">16,12</Thickness>
+    <Thickness x:Key="PaddingTableHeader">12,0,16,0</Thickness>
+    <Thickness x:Key="PaddingTableRow">12,0,16,0</Thickness>
+    <Thickness x:Key="PaddingInput">12,0</Thickness>
+    <Thickness x:Key="PaddingInputIcon">16,0,40,0</Thickness>
+    <Thickness x:Key="PaddingInputIconCompact">12,0,32,0</Thickness>
+    <Thickness x:Key="PaddingPill">10,0</Thickness>
+    <Thickness x:Key="PaddingDialogFooter">24,0</Thickness>
+
+    <!-- Radios de esquina spec §4 (tipo CornerRadius para asignarse vía DynamicResource). -->
+    <!-- Radio de botones e inputs (10). -->
+    <CornerRadius x:Key="RadiusButton">10</CornerRadius>
+    <!-- Radio de tarjetas (14). -->
+    <CornerRadius x:Key="RadiusCard">14</CornerRadius>
+    <!-- Radio de pills de estado (13 = altura 26 / 2). -->
+    <CornerRadius x:Key="RadiusPill">13</CornerRadius>
+    <!-- Radio de botones pequeños de tabla (8). -->
+    <CornerRadius x:Key="RadiusTableButton">8</CornerRadius>
+    <!-- Radio de botones circulares (36 / 2). -->
+    <CornerRadius x:Key="RadiusCircle">18</CornerRadius>
+</ResourceDictionary>

@@ -1,0 +1,93 @@
+<!-- CobroView.axaml — Diálogo de registro de cobro: resumen de deuda, monto/medio de pago y historial de pagos. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.CobroView"
+        x:DataType="vm:CobroViewModel"
+        Title="{Binding Title}"
+        Width="560" Height="560" MinWidth="540" MinHeight="500"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: Cancelar / Registrar cobro con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Registrar cobro" Click="OnConfirm" />
+            </StackPanel>
+        </Border>
+
+        <!-- Formulario desplazable: datos del cliente, totales, monto a cobrar e historial. -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24" Spacing="16">
+
+                <!-- Identificación del cliente (texto compuesto desde el VM). -->
+                <TextBlock Text="{Binding ClienteText}" FontSize="{DynamicResource FontSizeAccent}" Foreground="{DynamicResource TextPrimary}" />
+
+                <!-- Resumen de la deuda: total a pagar, ya pagado y saldo pendiente en rojo (DangerBadge). -->
+                <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                    <TextBlock Text="Total a pagar:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Text="Ya pagado:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding PagadoText}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Text="Saldo pendiente:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding SaldoText}" FontWeight="Bold"
+                               Foreground="{DynamicResource DangerBadge}" VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- Datos del cobro: monto, botón "Cobrar completo", medio de pago y opción de entrega. -->
+                <Grid ColumnDefinitions="190,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+                    <TextBlock Text="Monto a cobrar:" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <NumericUpDown Grid.Column="1" Value="{Binding Monto, Mode=TwoWay}" Minimum="0"
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" />
+                    <Button Grid.Column="2" Classes="Secondary" Content="Cobrar completo" Command="{Binding CobrarCompletoCommand}" />
+                    <TextBlock Grid.Row="1" Text="Medio de pago:" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                    <ComboBox Grid.Column="1" Grid.Row="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding Metodos}" SelectedItem="{Binding Metodo, Mode=TwoWay}" />
+                    <CheckBox Grid.Column="1" Grid.Row="2" Content="Marcar como entregado tras el cobro"
+                              IsChecked="{Binding MarcarEntregado, Mode=TwoWay}" IsVisible="{Binding CanMarcarEntregado}" />
+                </Grid>
+
+                <!-- Título del historial de pagos de la orden. -->
+                <TextBlock FontSize="{DynamicResource FontSizeAccent}" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Text="▪ Historial de pagos" />
+                <!-- Tabla de pagos anteriores: encabezado fijo y filas en scroll (fecha, monto, medio, concepto, saldo). -->
+                <Border BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="1" CornerRadius="10" Padding="8">
+                    <Grid RowDefinitions="Auto,Auto" MinHeight="120">
+                        <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="8">
+                            <TextBlock Classes="TableHeader" Text="Fecha" />
+                            <TextBlock Grid.Column="1" Classes="TableHeader" Text="Monto" />
+                            <TextBlock Grid.Column="2" Classes="TableHeader" Text="Medio" />
+                            <TextBlock Grid.Column="3" Classes="TableHeader" Text="Concepto" />
+                            <TextBlock Grid.Column="4" Classes="TableHeader" Text="Saldo" />
+                        </Grid>
+                        <ScrollViewer Grid.Row="1" MaxHeight="150" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Historial}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:PagoRow">
+                                        <Border BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,0,0,1" Padding="4,4">
+                                            <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="8">
+                                                <TextBlock Text="{Binding Fecha}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Monto}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Metodo}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="3" Text="{Binding Concepto}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="4" Text="{Binding Saldo}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+
+</Window>

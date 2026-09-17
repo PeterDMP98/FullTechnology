@@ -1,0 +1,111 @@
+<!-- ConfigurationView.axaml — Configuración del negocio: nombre, moneda, apariencia (tema) y base de datos (respaldo/importación).
+     El nombre sigue la convención del ViewLocator: ConfigurationViewModel → ConfigurationView. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+             x:Class="FULLTECHNOLOGY.Presentation.Views.ConfigurationView"
+             x:DataType="vm:ConfigurationViewModel">
+
+    <!-- FASE 10: Configuración del negocio (paridad del menú de ajustes de MainForm v2). -->
+    <!-- Lienzo desplazable vertical: panel de tarjetas de configuración de ancho máximo 860px. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel MaxWidth="860" Spacing="16" Margin="0,0,0,24">
+
+            <!-- ============ NOMBRE DEL NEGOCIO ============ -->
+            <!-- Tarjeta: cambiar el nombre del negocio (afecta sidebar, encabezado y documentos). -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" Padding="{DynamicResource PaddingCard}">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Nombre del negocio" FontSize="{DynamicResource FontSizeCardTitle}" FontWeight="SemiBold" />
+                            <TextBlock Text="Se muestra en la barra lateral, el encabezado y los documentos."
+                                       FontSize="{DynamicResource FontSizeSubtitle}" Foreground="{DynamicResource TextSecondary}" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Classes="Secondary" Content="Cambiar nombre"
+                                Command="{Binding CambiarNombreCommand}"
+                                VerticalAlignment="Center" />
+                    </Grid>
+                    <!-- Caja de vista previa del nombre actual (business name) en acento claro. -->
+                    <Border Background="{DynamicResource BgRowAlt}" CornerRadius="{DynamicResource RadiusTableButton}"
+                            Padding="16,10">
+                        <TextBlock Text="{Binding BusinessName}" FontSize="{DynamicResource FontSizeHero}" FontWeight="Bold"
+                                   Foreground="{DynamicResource AccentPrimaryLight}" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ============ TIPO DE MONEDA ============ -->
+            <!-- Tarjeta: tipo de moneda con selección rápida por botones (cambia los formatos de montos). -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" Padding="{DynamicResource PaddingCard}">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Tipo de moneda" FontSize="{DynamicResource FontSizeCardTitle}" FontWeight="SemiBold" />
+                            <TextBlock Text="El formato de montos de toda la aplicación cambia de inmediato."
+                                       FontSize="{DynamicResource FontSizeSubtitle}" Foreground="{DynamicResource TextSecondary}" />
+                        </StackPanel>
+                        <!-- Pill de la moneda activa (BgRowAlt, radio pill). -->
+                        <Border Grid.Column="1" VerticalAlignment="Center" Background="{DynamicResource BgRowAlt}"
+                            CornerRadius="{DynamicResource RadiusPill}" Padding="{DynamicResource PaddingPill}">
+                            <TextBlock Text="{Binding Currency}" FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AccentPrimaryLight}" />
+                        </Border>
+                    </Grid>
+                    <!-- Botones de monedas disponibles; el comando se toma del DataContext del ItemsControl
+                         ($parent[...]) para poder llamar a CambiarMonedaCommand desde cada ítem. -->
+                    <ItemsControl ItemsSource="{Binding Currencies}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Button Classes="Secondary" Content="{Binding}"
+                                        Command="{Binding $parent[ItemsControl].DataContext.CambiarMonedaCommand}"
+                                        CommandParameter="{Binding}"
+                                        Margin="0,0,8,8" Padding="{DynamicResource PaddingButton}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- ============ APARIENCIA ============ -->
+            <!-- Tarjeta: tema actual e interruptor claro/oscuro (ToggleTemaCommand). -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" Padding="{DynamicResource PaddingCard}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="Apariencia" FontSize="{DynamicResource FontSizeCardTitle}" FontWeight="SemiBold" />
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Tema actual:" FontSize="{DynamicResource FontSizeSubtitle}" Foreground="{DynamicResource TextSecondary}" />
+                            <TextBlock Text="{Binding ThemeLabel}" FontSize="{DynamicResource FontSizeSubtitle}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AccentPrimaryLight}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="Secondary" Content="Cambiar a modo claro/oscuro"
+                            Command="{Binding ToggleTemaCommand}"
+                            VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <!-- ============ BASE DE DATOS ============ -->
+            <!-- Tarjeta: copia de seguridad (backup SQLite) e importación desde respaldo, por code-behind. -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" Padding="{DynamicResource PaddingCard}">
+                <StackPanel Spacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Base de datos" FontSize="{DynamicResource FontSizeCardTitle}" FontWeight="SemiBold" />
+                        <TextBlock Text="Copia de seguridad en un archivo SQLite y restauración desde un respaldo."
+                                   FontSize="{DynamicResource FontSizeSubtitle}" Foreground="{DynamicResource TextSecondary}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Classes="Primary" Content="Copia de seguridad" Click="OnBackupClick" />
+                        <Button Classes="Secondary" Content="Importar base de datos" Click="OnImportClick" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

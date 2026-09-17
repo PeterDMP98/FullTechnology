@@ -1,0 +1,249 @@
+<!-- MainWindow.axaml — Shell principal de la app: titlebar custom, sidebar de navegación y host de vistas con transición. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+        xmlns:controls="using:Avalonia.Controls"
+        xmlns:svc="using:FULLTECHNOLOGY.Presentation.Services"
+        xmlns:auto="using:Avalonia.Automation"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.MainWindow"
+        x:DataType="vm:ShellViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding BusinessName}"
+        Width="1280" Height="800"
+        MinWidth="1024" MinHeight="640"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        Background="{DynamicResource BgApp}">
+
+    <Window.Resources>
+        <!-- Ítem del sidebar: fila completa 44px (spec §3.3.a) con hover y selección.
+             ControlTheme aplicado a los ListBoxItem del menú: fondo transparente por defecto,
+             fondo alterno (BgRowAlt) al pasar el ratón y acento (AccentPrimary) al estar seleccionado.
+             x:Name="Bg" en el template es lo que permiten apuntar los selectores ^:pointerover / ^:selected. -->
+        <ControlTheme x:Key="SidebarItemTheme" TargetType="ListBoxItem">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="CornerRadius" Value="{DynamicResource RadiusButton}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.14" />
+                </Transitions>
+            </Setter>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border x:Name="Bg" Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Padding="{TemplateBinding Padding}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Bg">
+                <Setter Property="Background" Value="{DynamicResource BgRowAlt}" />
+            </Style>
+            <Style Selector="^:selected /template/ Border#Bg">
+                <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
+            </Style>
+        </ControlTheme>
+    </Window.Resources>
+
+    <!-- FASE 8: shell con design system (spec §3.1–§3.4) y titlebar custom (§5.1).
+         Sin posiciones absolutas, sin nombres de empresa hardcodeados.
+         Layout en 2 filas (62px topbar / contenido *) y 2 columnas (sidebar auto / contenido *).
+         Nota: la bottom bar de navegación (spec §3.4) se retiró en 2026-09-14 porque el
+         sidebar ya navega todos los módulos. -->
+    <Grid RowDefinitions="62,*" ColumnDefinitions="Auto,*">
+
+        <!-- ===================== TOPBAR 62px (spec §3.1) ===================== -->
+        <!-- Barra superior: ocupa todo el ancho (Grid.ColumnSpan) y actúa como área arrastrable
+             de la ventana (PointerPressed / Tapped resuelven el drag y el doble clic en code-behind,
+             porque la ventana no tiene decoraciones nativas: WindowDecorations="None"). -->
+        <Border Grid.Row="0" Grid.ColumnSpan="2"
+                Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}"
+                BorderThickness="0,0,0,1"
+                PointerPressed="OnTitleBarPointerPressed"
+                Tapped="OnTitleBarTapped">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+
+                <!-- Zona izquierda: logo + marca del negocio (dinámica) + colapso -->
+                <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center"
+                            Margin="16,0,0,0">
+                    <!-- Logotipo: medallón cuadrado de acento con la inicial del negocio. -->
+                    <Border Width="40" Height="40" CornerRadius="10"
+                            Background="{DynamicResource AccentPrimary}"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="D" FontSize="{DynamicResource FontSizeHero}" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextPrimary}" />
+                    </Border>
+                    <!-- Marca: nombre del negocio partido en dos tonos (primera parte en claro, resto en acento).
+                         El subtítulo identifica el sistema; ambos bindings vienen del VM. -->
+                    <Grid RowDefinitions="Auto,Auto" VerticalAlignment="Center">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="0">
+                            <TextBlock Text="{Binding BrandNamePart}" FontSize="{DynamicResource FontSizeBrand}" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextPrimary}" />
+                            <TextBlock Text="{Binding BrandRestPart}" FontSize="{DynamicResource FontSizeBrand}" FontWeight="Bold"
+                                       Foreground="{DynamicResource AccentPrimaryLight}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Sistema de gestion de reparaciones"
+                                   FontSize="{DynamicResource FontSizeSubtitle}"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   IsVisible="{Binding IsBrandSubtitleVisible}" />
+                    </Grid>
+                    <!-- Botón de colapso/expansión del sidebar: usa glifo unicode (☰) y expone
+                         su propósito vía auto:AutomationProperties.Name + ToolTip.Tip. -->
+                    <Button Classes="Circular" Content="&#x2630;"
+                            Command="{Binding ToggleSidebarCommand}"
+                            ToolTip.Tip="Colapsar / expandir menu"
+                            auto:AutomationProperties.Name="Colapsar o expandir menú"
+                            VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Zona derecha: acciones + controles de ventana (flush right) -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="0">
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center" Margin="0,0,20,0">
+                        <!-- Luna: tema claro/oscuro (glifo ◐, accesible por AutomationProperties) -->
+                        <Button Classes="Circular"
+                                Content="&#x25D0;"
+                                Command="{Binding ToggleThemeCommand}"
+                                ToolTip.Tip="Cambiar tema claro/oscuro"
+                                auto:AutomationProperties.Name="Cambiar tema claro u oscuro" />
+
+                        <!-- Avatar + nombre de usuario (fijo, sin bindings). -->
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Border Width="36" Height="36" CornerRadius="18" Background="{DynamicResource BgCard}">
+                                <TextBlock Text="&#x1F464;" FontSize="{DynamicResource FontSizeIcon}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Admin" FontWeight="SemiBold" />
+                                <TextBlock Text="Administrador" FontSize="{DynamicResource FontSizeSubtitle}"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           IsVisible="{Binding IsAdminCaptionVisible}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Controles de ventana 46x62 (spec §5.1): minimizar/maximizar/cerrar.
+                         Sin texto: mínimiza (—), maximiza (▢) y cierra (✕); sus Click resuelven la acción
+                         en code-behind y cada uno declara ToolTip.Tip + auto:AutomationProperties.Name. -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                        <Button Classes="WindowControl" Content="&#x2014;" Click="OnMinimizeClick"
+                                ToolTip.Tip="Minimizar" auto:AutomationProperties.Name="Minimizar" />
+                        <Button x:Name="MaximizeButton" Classes="WindowControl" Content="&#x25A2;" Click="OnMaximizeClick"
+                                ToolTip.Tip="Maximizar / restaurar" auto:AutomationProperties.Name="Maximizar o restaurar" />
+                        <Button Classes="WindowControl close" Content="&#x2715;" Click="OnCloseClick"
+                                ToolTip.Tip="Cerrar" auto:AutomationProperties.Name="Cerrar ventana" />
+                    </StackPanel>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+        <!-- ===================== SIDEBAR (spec §3.2) ===================== -->
+        <!-- Barra lateral: ancho ligado a SidebarWidth (colapso animado). Contiene logo, menú
+             ListBox navegable y pie con la identidad del negocio. -->
+        <Border Grid.Row="1" Grid.Column="0"
+                Width="{Binding SidebarWidth}"
+                Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}"
+                BorderThickness="0,0,1,0">
+			
+			<Grid RowDefinitions="*,Auto">
+                <!-- Menú de navegación: lista de módulos. El ítem actual se marca con SelectedItem
+                     (TwoWay); cada fila usa SidebarItemTheme y solo muestra el label cuando IsExpanded. -->
+                <ListBox Grid.Row="0"
+					     ItemsSource="{Binding Items}"
+                         SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Margin="12,16,12,0"
+                         ItemContainerTheme="{StaticResource SidebarItemTheme}"
+                         DockPanel.Dock="Top">
+					
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="4" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+					
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:NavigationItem">
+                            <!-- Plantilla de ítem: columna de ícono (28) + etiqueta; muestra la fila completa como tooltip. -->
+                            <Grid ColumnDefinitions="28,*" VerticalAlignment="Center"
+                                  ToolTip.Tip="{Binding Label}">
+                                <TextBlock Text="{Binding Icon}" FontSize="{DynamicResource FontSizeHero}"
+                                           HorizontalAlignment="Center" />
+                                <StackPanel Grid.Column="1" IsVisible="{Binding IsExpanded}">
+                                    <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeAccent}" Margin="10,0,0,0" />
+                                </StackPanel>
+                            </Grid>
+							
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Footer del sidebar: identidad del negocio (nombre + powered by), visible solo expandido.
+             Banda fija pegada al borde inferior (Margin=0), con fondo y línea superior propios
+             para diferenciarla del menú. -->
+                <Border Grid.Row="1"
+						DockPanel.Dock="Bottom" Margin="0"
+                        Background="{DynamicResource BgCard}"
+                        BorderBrush="{DynamicResource BorderSubtle}"
+                        BorderThickness="0,1,0,0"
+                        Padding="16,12,16,14">
+					
+                    <StackPanel IsVisible="{Binding IsLabelsVisible}">
+                        <TextBlock Text="{Binding BusinessName}" Classes="BrandName" />
+                        <TextBlock Text="Powered by FULLTECHNOLOGY" Classes="BrandSub" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ===================== CONTENIDO (spec §3.3) ===================== -->
+        <!-- Área central: encabezado de página (medallón + título/subtítulo) y el host de vistas
+             con transición de aparición (FadePageTransition). -->
+        <Border Grid.Row="1" Grid.Column="1"
+                Background="{DynamicResource BgApp}"
+                Padding="{Binding ContentPadding}">
+            <Grid RowDefinitions="Auto,*">
+                <!-- Header de página: medallón 56 + título/subtítulo (oculto en módulos de pantalla completa) -->
+                <Grid Grid.Row="0" IsVisible="{Binding IsPageHeaderVisible}">
+                    <Border Background="{DynamicResource BgCard}" CornerRadius="14"
+                            Width="56" Height="56" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <TextBlock Text="{Binding CurrentGlyph}" FontSize="{DynamicResource FontSizeGlyph}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AccentPrimaryLight}" />
+                    </Border>
+                    <StackPanel Margin="72,0,0,0" VerticalAlignment="Top">
+                        <TextBlock Text="{Binding Title}" FontSize="{DynamicResource FontSizePageTitle}" FontWeight="Bold" />
+                        <TextBlock Text="{Binding Subtitle}" FontSize="{DynamicResource FontSizeBody}" Foreground="{DynamicResource TextSecondary}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Host de vistas con transición suave de aparición -->
+                <!-- TransitioningContentControl muestra la vista del módulo actual (Content=Current)
+                     con un desvanecimiento definido por svc:FadePageTransition. -->
+                <controls:TransitioningContentControl Grid.Row="1" Margin="{Binding ContentHostMargin}"
+                                                      Content="{Binding Current}">
+                    <controls:TransitioningContentControl.PageTransition>
+                        <svc:FadePageTransition />
+                    </controls:TransitioningContentControl.PageTransition>
+                </controls:TransitioningContentControl>
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</Window>

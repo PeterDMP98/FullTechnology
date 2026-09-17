@@ -1,0 +1,169 @@
+<!-- DesignSystemWindow.axaml — Vitrina de referencia del Design System (FASE 7): muestra tipografía, botones, inputs, pills, tarjetas y tabla de ejemplo. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.DesignSystemWindow"
+        x:DataType="vm:DesignSystemViewModel"
+        Title="Design System — FULLTECHNOLOGY"
+        Width="1100" Height="760"
+        Background="{DynamicResource BgApp}">
+
+    <!-- Los convertidores StatusBrush/TokenBrush/IsActive se heredan de Application.Resources (App.axaml). -->
+    <!-- Contenedor desplazable: lienzo central de 1020px y 24px de separación entre bloques. -->
+    <ScrollViewer Width="1100" Height="760">
+        <StackPanel MaxWidth="1020" HorizontalAlignment="Center" Margin="40,32" Spacing="24">
+
+            <!-- Encabezado de la vitrina: título y aclaración del principio de tokens de color. -->
+            <TextBlock Text="Design System — FASE 7" FontSize="{DynamicResource FontSizeStat}" FontWeight="Bold" />
+            <!-- Todos los colores vienen de {DynamicResource} de DarkTheme/LightTheme; ningún hex hardcodeado. -->
+            <TextBlock Text="Todos los colores vienen de {DynamicResource} de DarkTheme/LightTheme. Ningún hex hardcodeado." Classes="BrandSub" />
+
+            <!-- Tipografía -->
+            <!-- Bloque: escalas de texto del spec (§2): título de página, número stat, subtítulo y header de tabla. -->
+            <Border Classes="StatCard">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Título de página (22 Bold)" FontSize="{DynamicResource FontSizePageTitle}" FontWeight="Bold" />
+                    <TextBlock Text="Número de tarjeta stat (26 Bold)" FontSize="{DynamicResource FontSizeStat}" FontWeight="Bold" />
+                    <TextBlock Text="Subtítulo de sección (13, secundario)" Classes="BrandSub" />
+                    <TextBlock Text="Header de tabla (12 semibold, secundario)" FontSize="{DynamicResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Botones -->
+            <!-- Bloque: variantes de botón del Design System (Primary, Secondary, Table, Circular, Page). -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Botones" FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <Button Classes="Primary" Content="+ Nuevo ingreso" Width="170" Height="{DynamicResource HeightControl}" />
+                    <Button Classes="Secondary" Content="Cancelar" />
+                    <Button Classes="Table" Content="Ver" />
+                    <Button Classes="Circular" Content="◐" />
+                    <Button Classes="Page" Content="1" />
+                    <Button Classes="Page active" Content="2" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Inputs -->
+            <!-- Bloque: campos de entrada estándar (TextBox.Input y ComboBox.Filter). -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Inputs" FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <TextBox Classes="Input" Width="380" Height="{DynamicResource HeightControl}" PlaceholderText="Buscar cliente, orden o equipo…" />
+                    <ComboBox Classes="Filter" Width="180" SelectedIndex="0">
+                        <ComboBoxItem Content="Todos los estados" />
+                        <ComboBoxItem Content="Recibido" />
+                        <ComboBoxItem Content="En reparación" />
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Pills de estado -->
+            <!-- Bloque: pills de estado con fondo al 15% (param soft) y punto/texto en color sólido;
+                 StatusBrush resuelve el token a partir del valor del "status". -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Pills de estado (fondo al 15% + punto y texto del color sólido)" FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" />
+                <ItemsControl ItemsSource="{Binding Statuses}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Classes="Pill"
+                                    Background="{Binding, Converter={StaticResource StatusBrush}, ConverterParameter=soft}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Classes="PillDot" Fill="{Binding, Converter={StaticResource StatusBrush}}" />
+                                    <TextBlock Classes="PillText" Text="{Binding}"
+                                               Foreground="{Binding, Converter={StaticResource StatusBrush}}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Tarjetas de estadísticas -->
+            <!-- Bloque: tarjetas stat (110px) en grid uniforme; la barra de color usa TokenBrush
+                 con la clave de color del VM (ColorKey) y el resto de propiedades vienen de StatCard/StatNumber/StatLabel. -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Tarjetas de estadísticas (110px, 5 columnas + gap 16)" FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" />
+                <ItemsControl Height="110" ItemsSource="{Binding Stats}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Classes="StatCard" Margin="0,0,16,0">
+                                <Grid RowDefinitions="Auto,*,Auto">
+                                    <Border Classes="StatIcon" HorizontalAlignment="Left">
+                                        <TextBlock Text="◆" FontSize="{DynamicResource FontSizeIcon}" />
+                                    </Border>
+                                    <TextBlock Grid.Row="1" Text="{Binding Number}" Classes="StatNumber"
+                                               HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Row="1" Text="{Binding Label}" Classes="StatLabel"
+                                               HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                                    <Border Grid.Row="2" Classes="StatBar"
+                                            Background="{Binding ColorKey, Converter={StaticResource TokenBrush}}"
+                                            HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Tabla -->
+            <!-- Bloque: tabla de ejemplo (ItemsControl) con fila de header fija, celdas, pill de estado
+                 en la columna Estado y botón "Ver". -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Tabla (ItemsControl, fila 46px, hover)" FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" />
+                <Border Classes="TableHeader">
+                    <Grid ColumnDefinitions="110,100,130,90,130,130,120,120">
+                        <TextBlock Classes="TableHeader" Text="Orden" />
+                        <TextBlock Classes="TableHeader" Text="Cliente" Grid.Column="1" />
+                        <TextBlock Classes="TableHeader" Text="Documento" Grid.Column="2" />
+                        <TextBlock Classes="TableHeader" Text="Celular" Grid.Column="3" />
+                        <TextBlock Classes="TableHeader" Text="Equipo" Grid.Column="4" />
+                        <TextBlock Classes="TableHeader" Text="Estado" Grid.Column="5" />
+                        <TextBlock Classes="TableHeader" Text="Total" Grid.Column="6" />
+                        <TextBlock Classes="TableHeader" Text="Saldo" Grid.Column="7" />
+                    </Grid>
+                </Border>
+                <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DesignSystemViewModel+RowSample">
+                            <Border Classes="TableRow">
+                                <Grid ColumnDefinitions="110,100,130,90,130,130,120,120,140">
+                                    <TextBlock Classes="TableCell" Text="{Binding Orden}" />
+                                    <TextBlock Classes="TableCell" Text="{Binding Cliente}" Grid.Column="1" />
+                                    <TextBlock Classes="TableCell" Text="{Binding Documento}" Grid.Column="2" />
+                                    <TextBlock Classes="TableCell" Text="{Binding Celular}" Grid.Column="3" />
+                                    <TextBlock Classes="TableCell" Text="{Binding Equipo}" Grid.Column="4" />
+                                    <Grid Grid.Column="5">
+                                        <Border Classes="Pill"
+                                                Background="{Binding Estado, Converter={StaticResource StatusBrush}, ConverterParameter=soft}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Classes="PillDot" Fill="{Binding Estado, Converter={StaticResource StatusBrush}}" />
+                                                <TextBlock Classes="PillText" Text="{Binding Estado}"
+                                                           Foreground="{Binding Estado, Converter={StaticResource StatusBrush}}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Classes="TableCell" Text="{Binding Total}" Grid.Column="6" />
+                                    <TextBlock Classes="TableCell" Text="{Binding Saldo}" Grid.Column="7" />
+                                    <Button Classes="Table" Content="Ver" Grid.Column="8" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</Window>
