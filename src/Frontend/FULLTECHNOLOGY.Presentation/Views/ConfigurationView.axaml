@@ -89,6 +89,44 @@
                 </Grid>
             </Border>
 
+            <!-- ============ ALERTAS DEL INICIO ============ -->
+            <!-- Tarjeta: umbrales de las alertas de la página Inicio (stock mínimo por tipo y días de tiempo). -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" Padding="{DynamicResource PaddingCard}">
+                <StackPanel Spacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Alertas del Inicio" FontSize="{DynamicResource FontSizeCardTitle}" FontWeight="SemiBold" />
+                        <TextBlock Text="Cantidad mínima de stock y días de espera que activan las alertas de la página Inicio."
+                                   FontSize="{DynamicResource FontSizeSubtitle}" Foreground="{DynamicResource TextSecondary}" />
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="190,*,80" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                        <TextBlock Text="Accesorios (stock mínimo):" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                        <NumericUpDown Grid.Column="1" Value="{Binding StockAccesorioUmbral, Mode=TwoWay}"
+                                       Minimum="1" Maximum="9999" FormatString="0" HorizontalAlignment="Stretch" />
+                        <TextBlock Grid.Column="2" Text="unidades" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+
+                        <TextBlock Grid.Row="1" Text="Repuestos (stock mínimo):" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                        <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding StockRepuestoUmbral, Mode=TwoWay}"
+                                       Minimum="1" Maximum="9999" FormatString="0" HorizontalAlignment="Stretch" />
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="unidades" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+
+                        <TextBlock Grid.Row="2" Text="Recibido → listo (días):" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                        <NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding DiasRecibidoAListo, Mode=TwoWay}"
+                                       Minimum="1" Maximum="999" FormatString="0" HorizontalAlignment="Stretch" />
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="días" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+
+                        <TextBlock Grid.Row="3" Text="Listo → entregado (días):" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                        <NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding DiasListoAEntregado, Mode=TwoWay}"
+                                       Minimum="1" Maximum="999" FormatString="0" HorizontalAlignment="Stretch" />
+                        <TextBlock Grid.Row="3" Grid.Column="2" Text="días" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                        <Button Classes="Primary" Content="Guardar alertas" Command="{Binding GuardarAlertasCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!-- ============ BASE DE DATOS ============ -->
             <!-- Tarjeta: copia de seguridad (backup SQLite) e importación desde respaldo, por code-behind. -->
             <Border Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" Padding="{DynamicResource PaddingCard}">

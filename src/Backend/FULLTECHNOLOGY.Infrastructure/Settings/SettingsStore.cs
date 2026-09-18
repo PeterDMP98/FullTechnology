@@ -156,4 +156,11 @@ public static class SettingsKeys
     public const string PinHabilitado = "pinHabilitado";
     public const string EmailDiario = "emailDiario";
     public const string Tema = "tema";
+
+    // Umbrales de alerta del panel Inicio (v3.5). Defaults: stock 3 unidades por
+    // tipo y 15/20 días para recibido→listo y listo→entregado.
+    public const string AlertaStockAccesorio = "alertaStockAccesorio";
+    public const string AlertaStockRepuesto = "alertaStockRepuesto";
+    public const string AlertaDiasRecibidoAListo = "alertaDiasRecibidoAListo";
+    public const string AlertaDiasListoAEntregado = "alertaDiasListoAEntregado";
 }

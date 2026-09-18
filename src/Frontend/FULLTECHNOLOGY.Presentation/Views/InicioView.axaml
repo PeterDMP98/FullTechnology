@@ -1,0 +1,73 @@
+<!-- InicioView.axaml — Panel Inicio (v3.5): tarjetas de alertas (stock y tiempos) que abren ventanas flotantes con el detalle. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels"
+             xmlns:vmi="using:FULLTECHNOLOGY.Presentation.ViewModels.Inicio"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+             x:Class="FULLTECHNOLOGY.Presentation.Views.InicioView"
+             x:DataType="vm:InicioViewModel">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="20">
+
+        <!-- ===================== CARDS DE ALERTAS ===================== -->
+        <!-- Cuatro tarjetas cliqueables; cada clic abre su ventana flotante de detalle. -->
+        <ItemsControl Grid.Row="0" ItemsSource="{Binding Cards}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="4" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vmi:InicioCardViewModel">
+                    <Button Background="Transparent" Padding="0" Margin="0,0,12,0"
+                            HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                            Command="{Binding OpenCommand}">
+                        <Border Classes="StatCard" HorizontalAlignment="Stretch"
+                                Background="{DynamicResource BgCard}">
+                            <StackPanel Spacing="14">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                                    <Border Classes="StatIcon"
+                                            Background="{Binding AccentToken, Converter={StaticResource TokenBrush}, ConverterParameter=soft}">
+                                        <TextBlock Text="{Binding Glyph}" FontSize="{DynamicResource FontSizeHero}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Foreground="{Binding AccentToken, Converter={StaticResource TokenBrush}}" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                        <TextBlock Classes="StatNumber" Text="{Binding Value}" />
+                                        <TextBlock Classes="StatLabel" Text="{Binding Label}" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Grid>
+                                <Border Classes="StatBar" HorizontalAlignment="Left"
+                                        Background="{Binding AccentToken, Converter={StaticResource TokenBrush}}" />
+                            </StackPanel>
+                        </Border>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- ===================== RESUMEN ===================== -->
+        <!-- Estado general: "todo en orden" o resumen de alertas pendientes. -->
+        <Border Grid.Row="1" Background="{DynamicResource BgCard}"
+                CornerRadius="{DynamicResource RadiusCard}" Padding="{DynamicResource PaddingCard}">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                <Border Width="48" Height="48" CornerRadius="{DynamicResource RadiusButton}" VerticalAlignment="Center"
+                        Background="{Binding StateToken, Converter={StaticResource TokenBrush}, ConverterParameter=soft}">
+                    <TextBlock Text="{Binding StateGlyph}" FontSize="{DynamicResource FontSizeAccent}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{Binding StateToken, Converter={StaticResource TokenBrush}}" />
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                    <TextBlock Text="{Binding StateTitle}"
+                               FontSize="{DynamicResource FontSizeCardTitle}" FontWeight="Bold" />
+                    <TextBlock Text="{Binding SummaryText}" TextWrapping="Wrap"
+                               Foreground="{DynamicResource TextSecondary}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</UserControl>

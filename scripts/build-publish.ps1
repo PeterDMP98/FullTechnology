@@ -6,7 +6,7 @@
 #   .\scripts\build-publish.ps1 -Target osx-x64
 #   .\scripts\build-publish.ps1 -Target win-x64 -NoRestore
 #
-# Salida: src\Frontend\FULLTECHNOLOGY.Presentation\bin\Release\net10.0\<Target>\publish\
+# Salida: src\Frontend\FULLTECHNOLOGY.Presentation\bin\Release\net10.0-windows\<Target>\publish\
 #   - win-x64 : FULLTECHNOLOGY.Presentation.exe (preparado para el instalador Inno Setup)
 #   - linux-x64 / osx-x64 : binario apphost sin extensión (ELF / Mach-O)
 #   - Los nativos multiplataforma se incluyen solos por RID:
@@ -35,7 +35,7 @@ $argsList = @('publish', $csproj, '-c', 'Release', '-r', $Target, '--self-contai
 & dotnet @argsList
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish $Target falló con código $LASTEXITCODE." }
 
-$pub = Join-Path $root "src\Frontend\FULLTECHNOLOGY.Presentation\bin\Release\net10.0\$Target\publish"
+$pub = Join-Path $root "src\Frontend\FULLTECHNOLOGY.Presentation\bin\Release\net10.0-windows\$Target\publish"
 $size = [math]::Round((Get-ChildItem $pub -Recurse -File | Measure-Object Length -Sum).Sum / 1MB, 0)
 $files = (Get-ChildItem $pub -File | Measure-Object).Count
 Write-Host "[publish] OK: $pub ($files archivos, $size MB)" -ForegroundColor Green

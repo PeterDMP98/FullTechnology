@@ -2,6 +2,13 @@
 
 Registro de versiones del instalador de FullTechnology.
 
+## v3.5 — 2026-09-18
+
+- **Todo el software v3.5 (spec `docs/specs/actulizacion v3.5.md`)**: Inicio como tablero de alertas (stock bajo accesorios/repuestos y órdenes con tiempo vencido), umbrales editables en Configuración, **factura PDF** con previsualización e impresión al cerrar una venta (reimprimible desde Historial), exportar/importar del inventario (PDF/Excel), formularios alineados a la izquierda, corrección `(null) to System.Decimal`, columnas alineadas y **redimensionables** en todas las tablas.
+- **Corrección de migración de base de datos**: al arrancar la app ahora aplica las migraciones del esquema v3.5 (`StatusChangedAt` y columnas de alertas) sobre bases existentes v2/v3; se reparó también el arranque desde Visual Studio (perfil de depuración `.NET Core` vía `launchSettings.json`, limpieza de builds viejos `net10.0`).
+- **TFM `net10.0-windows`**: el publish self-contained se genera ahora en `bin\Release\net10.0-windows\win-x64\publish\` (actualizado en `scripts/installer.iss`).
+- Recompilado y publicado como instalador self-contained `win-x64` (`FullTechnology_Setup_v3.5.exe`).
+
 ## v3.2 — 2026-09-17
 
 - **Actualización de interfaz**: iconos por módulo en el sidebar, el avatar de usuario del topbar y las tarjetas de mantenimiento, con íconos más grandes.

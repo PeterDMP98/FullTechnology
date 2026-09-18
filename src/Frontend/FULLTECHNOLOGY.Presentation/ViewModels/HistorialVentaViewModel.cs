@@ -3,8 +3,11 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FULLTECHNOLOGY.Application.Services;
+using FULLTECHNOLOGY.Infrastructure.Reporting;
 using FULLTECHNOLOGY.Presentation.Services;
+using FULLTECHNOLOGY.Presentation.ViewModels.Dialogs;
 using FULLTECHNOLOGY.Presentation.ViewModels.HistorialVenta;
+using FULLTECHNOLOGY.Presentation.Views.Dialogs;
 
 namespace FULLTECHNOLOGY.Presentation.ViewModels;
 
@@ -85,6 +88,34 @@ public partial class HistorialVentaViewModel : ViewModelBase, IRefreshable
         await _dialogs.ShowMessageAsync("Detalle de venta", row.DetalleTexto);
     }
 
+    /// <summary>
+    /// [RelayCommand] genera ImprimirFacturaCommand: regenera el PDF de la factura
+    /// (Documentos\Facturas) y abre la previsualización con opción de imprimirla
+    /// (selección de impresora de Windows), igual que al cerrar una compra.
+    /// </summary>
+    [RelayCommand]
+    private async Task ImprimirFacturaAsync(HistorialVentaRowViewModel? row)
+    {
+        if (row is null) return;
+        if (DialogService.OwnerWindow is null) return;
+
+        try
+        {
+            var detalles = await Task.Run(() => _ventas.GetVentaLineas(row.Venta.Id));
+            var lineas = detalles.Select(d => new InvoiceReport.Linea(d.ProductoNombre, d.Cantidad, d.PrecioUnitario)).ToList();
+            var pdf = InvoiceReport.SaveInvoicePdf(row.Venta.VentaNumber, row.Venta.ClienteNombre, row.Venta.Fecha,
+                row.Venta.MetodoPago, lineas, row.Venta.Subtotal, row.Venta.Descuento, row.Venta.Total);
+            var preview = new InvoicePreviewViewModel(row.Venta, lineas, _currency, pdf);
+            var win = new InvoicePreviewDialogView { DataContext = preview };
+            await win.ShowDialog<bool>(DialogService.OwnerWindow!);
+        }
+        catch (Exception ex)
+        {
+            await _dialogs.ShowMessageAsync("Imprimir factura",
+                $"No se pudo generar la factura {row.Venta.VentaNumber}.\nDetalle: {ex.Message}");
+        }
+    }
+
     private void Reload()
     {
         var version = Interlocked.Increment(ref _version);
@@ -114,7 +145,7 @@ public partial class HistorialVentaViewModel : ViewModelBase, IRefreshable
             decimal total = 0;
             foreach (var v in ventas)
             {
-                Rows.Add(new HistorialVentaRowViewModel(v, _currency, VerCommand));
+                Rows.Add(new HistorialVentaRowViewModel(v, _currency, VerCommand, ImprimirFacturaCommand));
                 total += v.Total;
             }
             IsEmpty = Rows.Count == 0;

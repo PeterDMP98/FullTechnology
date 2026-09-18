@@ -90,8 +90,8 @@ AND (@status='' OR Status=@status) ORDER BY Id DESC";
             // insertar; como OrderNumber es UNIQUE en el esquema, el número se
             // asigna una única vez y ya no se modifica en ediciones posteriores.
             o.OrderNumber = NextOrderNumber(c);
-            cmd.CommandText = @"INSERT INTO ServiceOrders (OrderNumber,ClienteId,CustomerName,CustomerDoc,CustomerPhone,DeviceType,Brand,Model,SerialImei,Color,PhysicalCondition,Accessories,ReportedFault,Diagnosis,RepairDetails,Status,DiagnosisCost,PartsCost,LaborCost,Discount,Deposit,PaymentMethod,ReceivedAt,DeliveredAt,Notes)
-VALUES (@OrderNumber,@ClienteId,@CustomerName,@CustomerDoc,@CustomerPhone,@DeviceType,@Brand,@Model,@SerialImei,@Color,@PhysicalCondition,@Accessories,@ReportedFault,@Diagnosis,@RepairDetails,@Status,@DiagnosisCost,@PartsCost,@LaborCost,@Discount,@Deposit,@PaymentMethod,@ReceivedAt,@DeliveredAt,@Notes);";
+            cmd.CommandText = @"INSERT INTO ServiceOrders (OrderNumber,ClienteId,CustomerName,CustomerDoc,CustomerPhone,DeviceType,Brand,Model,SerialImei,Color,PhysicalCondition,Accessories,ReportedFault,Diagnosis,RepairDetails,Status,DiagnosisCost,PartsCost,LaborCost,Discount,Deposit,PaymentMethod,ReceivedAt,DeliveredAt,StatusChangedAt,Notes)
+VALUES (@OrderNumber,@ClienteId,@CustomerName,@CustomerDoc,@CustomerPhone,@DeviceType,@Brand,@Model,@SerialImei,@Color,@PhysicalCondition,@Accessories,@ReportedFault,@Diagnosis,@RepairDetails,@Status,@DiagnosisCost,@PartsCost,@LaborCost,@Discount,@Deposit,@PaymentMethod,@ReceivedAt,@DeliveredAt,@StatusChangedAt,@Notes);";
             AddOrder(cmd, o);
             cmd.ExecuteNonQuery();
             cmd.Parameters.Clear();
@@ -102,7 +102,7 @@ VALUES (@OrderNumber,@ClienteId,@CustomerName,@CustomerDoc,@CustomerPhone,@Devic
         {
             // Orden existente: actualización completa por Id. El UPDATE no
             // incluye OrderNumber para que el número ya emitido sea estable.
-            cmd.CommandText = @"UPDATE ServiceOrders SET ClienteId=@ClienteId,CustomerName=@CustomerName,CustomerDoc=@CustomerDoc,CustomerPhone=@CustomerPhone,DeviceType=@DeviceType,Brand=@Brand,Model=@Model,SerialImei=@SerialImei,Color=@Color,PhysicalCondition=@PhysicalCondition,Accessories=@Accessories,ReportedFault=@ReportedFault,Diagnosis=@Diagnosis,RepairDetails=@RepairDetails,Status=@Status,DiagnosisCost=@DiagnosisCost,PartsCost=@PartsCost,LaborCost=@LaborCost,Discount=@Discount,Deposit=@Deposit,PaymentMethod=@PaymentMethod,ReceivedAt=@ReceivedAt,DeliveredAt=@DeliveredAt,Notes=@Notes WHERE Id=@Id;";
+            cmd.CommandText = @"UPDATE ServiceOrders SET ClienteId=@ClienteId,CustomerName=@CustomerName,CustomerDoc=@CustomerDoc,CustomerPhone=@CustomerPhone,DeviceType=@DeviceType,Brand=@Brand,Model=@Model,SerialImei=@SerialImei,Color=@Color,PhysicalCondition=@PhysicalCondition,Accessories=@Accessories,ReportedFault=@ReportedFault,Diagnosis=@Diagnosis,RepairDetails=@RepairDetails,Status=@Status,DiagnosisCost=@DiagnosisCost,PartsCost=@PartsCost,LaborCost=@LaborCost,Discount=@Discount,Deposit=@Deposit,PaymentMethod=@PaymentMethod,ReceivedAt=@ReceivedAt,DeliveredAt=@DeliveredAt,StatusChangedAt=@StatusChangedAt,Notes=@Notes WHERE Id=@Id;";
             cmd.Parameters.AddWithValue("@Id", o.Id);
             AddOrder(cmd, o);
             cmd.ExecuteNonQuery();
@@ -162,6 +162,7 @@ VALUES (@OrderNumber,@ClienteId,@CustomerName,@CustomerDoc,@CustomerPhone,@Devic
             ("@Diagnosis",(object?)o.Diagnosis),("@RepairDetails",(object?)o.RepairDetails),
             ("@Status",(object?)o.Status),("@PaymentMethod",(object?)o.PaymentMethod),
             ("@ReceivedAt",(object?)o.ReceivedAt.ToString("o")),("@DeliveredAt",(object?)o.DeliveredAt?.ToString("o")),
+            ("@StatusChangedAt",(object?)o.StatusChangedAt?.ToString("o")),
             ("@Notes",(object?)o.Notes)})
             cmd.Parameters.AddWithValue(p.Item1, p.Item2 ?? DBNull.Value);
         foreach (var p in new[]{
@@ -204,6 +205,7 @@ VALUES (@OrderNumber,@ClienteId,@CustomerName,@CustomerDoc,@CustomerPhone,@Devic
         PaymentMethod = ReadString(r, "PaymentMethod"),
         ReceivedAt = DateTime.Parse(ReadString(r, "ReceivedAt")),
         DeliveredAt = ReadNullableDate(r, "DeliveredAt"),
+        StatusChangedAt = ReadNullableDate(r, "StatusChangedAt"),
         Notes = ReadString(r, "Notes")
     };
 

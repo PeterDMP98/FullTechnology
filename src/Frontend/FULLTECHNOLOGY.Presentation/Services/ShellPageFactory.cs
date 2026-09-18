@@ -32,8 +32,8 @@ public class ShellPageFactory : IShellPageFactory
 
     public ViewModelBase? Create(string key) => key switch
     {
-        // "Inicio" es la única pantalla puramente estática: siempre placeholder.
-        NavKeys.Inicio => new PlaceholderViewModel("Inicio", "Dashboard con métricas de mantenimiento."),
+        // "Inicio" muestra las alertas de stock y de tiempo (v3.5); se degrada a placeholder sin DI.
+        NavKeys.Inicio => CrearInicio(),
         // El resto delegan en los módulos reales resueltos por DI.
         NavKeys.Mantenimiento => CrearMantenimiento(),
         NavKeys.Ventas => CrearVenta(),
@@ -49,6 +49,14 @@ public class ShellPageFactory : IShellPageFactory
     /// Módulo real (F9). Si no hay contenedor de DI (p. ej. en pruebas sin
     /// proveedor), cae en un placeholder para no romper la navegación.
     /// </summary>
+    private ViewModelBase CrearInicio()
+    {
+        var vm = _services?.GetService<InicioViewModel>();
+        return vm is not null
+            ? vm
+            : new PlaceholderViewModel("Inicio", "Notificaciones de stock y órdenes pendientes.");
+    }
+
     private ViewModelBase CrearMantenimiento()
     {
         var vm = _services?.GetService<MantenimientoViewModel>();

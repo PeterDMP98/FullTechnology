@@ -59,6 +59,7 @@ public class PaymentsService
         {
             o.Status = RepairStatuses.Entregado;
             o.DeliveredAt = DateTime.Now;
+            o.StatusChangedAt = DateTime.Now;
             marcaEntregado = true;
         }
 

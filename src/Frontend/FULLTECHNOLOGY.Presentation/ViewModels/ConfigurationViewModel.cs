@@ -20,6 +20,7 @@ public partial class ConfigurationViewModel : ViewModelBase
     private readonly ThemeService _theme;
     private readonly IDialogService _dialogs;
     private readonly IDatabaseBackupService _backup;
+    private readonly AlertsSettingsService _alerts;
 
     public string Subtitle => "Nombre del negocio, moneda, tema y base de datos.";
 
@@ -35,15 +36,38 @@ public partial class ConfigurationViewModel : ViewModelBase
     [ObservableProperty]
     public partial string ThemeLabel { get; set; }
 
-    public ConfigurationViewModel(BusinessSettingsService settings, ThemeService theme, IDialogService dialogs, IDatabaseBackupService backup)
+    // Umbrales de las alertas del Inicio (se editan y guardan en bloque).
+    [ObservableProperty]
+    public partial int StockAccesorioUmbral { get; set; }
+
+    [ObservableProperty]
+    public partial int StockRepuestoUmbral { get; set; }
+
+    [ObservableProperty]
+    public partial int DiasRecibidoAListo { get; set; }
+
+    [ObservableProperty]
+    public partial int DiasListoAEntregado { get; set; }
+
+    public ConfigurationViewModel(
+        BusinessSettingsService settings,
+        ThemeService theme,
+        IDialogService dialogs,
+        IDatabaseBackupService backup,
+        AlertsSettingsService alerts)
     {
         _settings = settings;
         _theme = theme;
         _dialogs = dialogs;
         _backup = backup;
+        _alerts = alerts;
         BusinessName = settings.BusinessName;
         Currency = settings.Currency;
         ThemeLabel = ThemeName();
+        StockAccesorioUmbral = alerts.StockAccesorioUmbral;
+        StockRepuestoUmbral = alerts.StockRepuestoUmbral;
+        DiasRecibidoAListo = alerts.DiasRecibidoAListo;
+        DiasListoAEntregado = alerts.DiasListoAEntregado;
         // Si el nombre cambia (p. ej. desde otro diálogo), se refleja aquí.
         _settings.BusinessNameChanged += () => BusinessName = _settings.BusinessName;
     }
@@ -78,6 +102,24 @@ public partial class ConfigurationViewModel : ViewModelBase
     {
         _theme.Toggle();
         ThemeLabel = ThemeName();
+    }
+
+    // Copia los umbrales editados al servicio y los persiste en settings.ini;
+    // se releen luego para normalizar valores inválidos (menores a 1).
+    [RelayCommand]
+    private async Task GuardarAlertasAsync()
+    {
+        _alerts.StockAccesorioUmbral = StockAccesorioUmbral;
+        _alerts.StockRepuestoUmbral = StockRepuestoUmbral;
+        _alerts.DiasRecibidoAListo = DiasRecibidoAListo;
+        _alerts.DiasListoAEntregado = DiasListoAEntregado;
+        _alerts.Save();
+
+        StockAccesorioUmbral = _alerts.StockAccesorioUmbral;
+        StockRepuestoUmbral = _alerts.StockRepuestoUmbral;
+        DiasRecibidoAListo = _alerts.DiasRecibidoAListo;
+        DiasListoAEntregado = _alerts.DiasListoAEntregado;
+        await _dialogs.ShowMessageAsync("Alertas del Inicio", "Umbrales de alerta guardados correctamente.");
     }
 
     // La ruta del archivo la entrega la vista (SaveFilePickerAsync en code-behind).

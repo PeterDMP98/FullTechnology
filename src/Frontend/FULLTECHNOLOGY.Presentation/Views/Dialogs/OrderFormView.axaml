@@ -5,8 +5,10 @@
         x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.OrderFormView"
         x:DataType="vm:OrderFormViewModel"
         Title="{Binding Title}"
-        Width="980" Height="820" MinWidth="900" MinHeight="620"
+        Icon="/Assets/avalonia-logo.ico"
+        Width="980" Height="820" MinWidth="900" MinHeight="480"
         WindowStartupLocation="CenterOwner"
+        Opened="OnOpened"
         Background="{DynamicResource BgApp}">
 
     <DockPanel>
@@ -46,10 +48,10 @@
                 <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="02. Dispositivo" />
                 <Grid ColumnDefinitions="190,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
                     <TextBlock Text="Tipo de Equipo *" VerticalAlignment="Center" />
-                    <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                    <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Left" Width="260"
                               ItemsSource="{Binding TiposEquipo}" SelectedItem="{Binding TipoEquipo, Mode=TwoWay}" />
                     <TextBlock Grid.Row="1" Text="Marca *" VerticalAlignment="Center" />
-                    <ComboBox Grid.Column="1" Grid.Row="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                    <ComboBox Grid.Column="1" Grid.Row="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Left" Width="260"
                               ItemsSource="{Binding Marcas}" SelectedItem="{Binding Marca, Mode=TwoWay}" />
                     <TextBlock Grid.Row="2" Text="Modelo" VerticalAlignment="Center" />
                     <TextBox Grid.Column="1" Grid.Row="2" Classes="Input" Height="{DynamicResource HeightControl}" Text="{Binding Modelo, Mode=TwoWay}" />
@@ -66,7 +68,7 @@
                 <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryLight}" Text="03. Diagnóstico y reparación" />
                 <Grid ColumnDefinitions="190,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="14">
                     <TextBlock Text="Estado Físico *" VerticalAlignment="Center" />
-                    <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                    <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Left" Width="260"
                               ItemsSource="{Binding Condiciones}" SelectedItem="{Binding CondicionFisica, Mode=TwoWay}" />
                     <TextBlock Grid.Row="1" Text="Diagnóstico" VerticalAlignment="Top" Margin="0,8,0,0" />
                     <TextBox Grid.Column="1" Grid.Row="1" Classes="Input" Height="84" AcceptsReturn="True" TextWrapping="Wrap"
@@ -86,12 +88,12 @@
                 <StackPanel Spacing="12">
                     <Grid ColumnDefinitions="190,*" ColumnSpacing="12">
                         <TextBlock Text="Estado de entrega" VerticalAlignment="Center" />
-                        <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                        <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Left" Width="260"
                                   ItemsSource="{Binding Estados}" SelectedItem="{Binding Estado, Mode=TwoWay}" />
                     </Grid>
                     <Grid ColumnDefinitions="190,*" ColumnSpacing="12">
                         <TextBlock Text="Forma de pago" VerticalAlignment="Center" />
-                        <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Stretch" MaxWidth="260"
+                        <ComboBox Grid.Column="1" Classes="Filter" Height="{DynamicResource HeightControl}" HorizontalAlignment="Left" Width="260"
                                   ItemsSource="{Binding MediosPago}" SelectedItem="{Binding FormaPago, Mode=TwoWay}" />
                     </Grid>
                 </StackPanel>
@@ -101,19 +103,19 @@
                 <Grid ColumnDefinitions="190,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
                     <TextBlock Text="Repuesto" VerticalAlignment="Center" />
                     <NumericUpDown Grid.Column="1" Value="{Binding Repuesto, Mode=TwoWay}" Minimum="0" Maximum="100000000000"
-                                   FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                                   FormatString="0" HorizontalAlignment="Left" Width="240" />
                     <TextBlock Grid.Row="1" Text="Mano de obra" VerticalAlignment="Center" />
                     <NumericUpDown Grid.Column="1" Grid.Row="1" Value="{Binding ManoObra, Mode=TwoWay}" Minimum="0"
-                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Left" Width="240" />
                     <TextBlock Grid.Row="2" Text="Abono" VerticalAlignment="Center" />
                     <NumericUpDown Grid.Column="1" Grid.Row="2" Value="{Binding Abono, Mode=TwoWay}" Minimum="0"
-                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Left" Width="240" />
                     <TextBlock Grid.Row="3" Text="Descuento" VerticalAlignment="Center" />
                     <NumericUpDown Grid.Column="1" Grid.Row="3" Value="{Binding Descuento, Mode=TwoWay}" Minimum="0"
-                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Left" Width="240" />
                     <TextBlock Grid.Row="4" Text="Diagnóstico" VerticalAlignment="Center" />
                     <NumericUpDown Grid.Column="1" Grid.Row="4" Value="{Binding CostoDiagnostico, Mode=TwoWay}" Minimum="0"
-                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Stretch" MaxWidth="240" />
+                                   Maximum="100000000000" FormatString="0" HorizontalAlignment="Left" Width="240" />
                 </Grid>
 
                 <!-- Total y saldo resumidos por el VM (total en rojo de peligro; saldo en secundario). -->

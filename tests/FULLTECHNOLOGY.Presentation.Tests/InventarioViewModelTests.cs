@@ -1,6 +1,7 @@
 // InventarioViewModelTests.cs — Pruebas del módulo de inventario: catálogo, filtros, búsqueda por nombre/código/proveedor y alta/edición.
 
 using FULLTECHNOLOGY.Domain;
+using FULLTECHNOLOGY.Domain.Entities;
 using FULLTECHNOLOGY.Presentation.ViewModels;
 using FULLTECHNOLOGY.Presentation.ViewModels.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
@@ -176,5 +177,74 @@ public class InventarioViewModelTests
         Assert.Equal("Bateria Pro Max", updated.Nombre);
         Assert.Equal(7, updated.Stock);
         Assert.Equal("PRD-K", updated.Codigo);
+    }
+
+    [Fact]
+    public async Task AplicarImportacion_AltaNuevaYActualizaExistente()
+    {
+        _h.SeedProducto("Bateria A", codigo: "PRD-A", stock: 5);
+        var vm = await BuildVmAsync();
+
+        var import = new[]
+        {
+            new Producto { Codigo = "PRD-B", Nombre = "Cargador USB", Tipo = ProductTypes.Accesorio, Costo = 8m, PrecioVenta = 20m, Stock = 4, FechaIngreso = DateTime.Today },
+            new Producto { Codigo = "PRD-A", Nombre = "Bateria Pro", Tipo = ProductTypes.Repuesto, Costo = 15m, PrecioVenta = 40m, Stock = 9, FechaIngreso = DateTime.Today }
+        };
+
+        var (nuevos, actualizados) = vm.AplicarImportacion(import);
+        await TestHelpers.WaitUntil(() => !vm.IsLoading);
+
+        // El código existente se actualiza y el nuevo se da de alta.
+        Assert.Equal(1, nuevos);
+        Assert.Equal(1, actualizados);
+        Assert.Equal(2, _h.InventorySvc.Search().Count);
+        var up = _h.InventorySvc.Search().Single(x => x.Codigo == "PRD-A");
+        Assert.Equal("Bateria Pro", up.Nombre);
+        Assert.Equal(9, up.Stock);
+        Assert.Equal(40m, up.PrecioVenta);
+    }
+
+    [Fact]
+    public async Task AplicarImportacion_SaneaNegativosYTipoDesconocido()
+    {
+        var vm = await BuildVmAsync();
+
+        var import = new[]
+        {
+            new Producto { Nombre = "Correa Rara", Tipo = "IMEI", Costo = -5m, PrecioVenta = -2m, Stock = -3, FechaIngreso = DateTime.Today }
+        };
+
+        var (nuevos, actualizados) = vm.AplicarImportacion(import);
+        await TestHelpers.WaitUntil(() => !vm.IsLoading);
+
+        Assert.Equal(1, nuevos);
+        Assert.Equal(0, actualizados);
+        var saved = _h.InventorySvc.Search().Single(x => x.Nombre == "Correa Rara");
+        Assert.Equal(ProductTypes.Accesorio, saved.Tipo);
+        Assert.Equal(0, saved.Costo);
+        Assert.Equal(0, saved.PrecioVenta);
+        Assert.Equal(0, saved.Stock);
+    }
+
+    [Fact]
+    public async Task Guardar_CamposNumericosVaciosTratanComoCero()
+    {
+        // Al limpiar un NumericUpDown el binding entrega null; el diálogo debe
+        // tratarlo como 0 al guardar (antes reventaba con "(null) a System.Decimal").
+        var dialog = _h.Services.GetRequiredService<ProductoEditDialogViewModel>();
+        dialog.Initialize(null);
+        dialog.Nombre = "Adaptador C";
+        dialog.SelectedTipo = ProductTypes.Accesorio;
+        dialog.Costo = null;
+        dialog.PrecioVenta = null;
+        dialog.Stock = null;
+
+        var result = await dialog.SaveAsync();
+
+        Assert.True(result);
+        Assert.NotNull(dialog.Saved);
+        Assert.Equal(0m, dialog.Saved.Costo);
+        Assert.Equal(0m, dialog.Saved.PrecioVenta);
+        Assert.Equal(0, dialog.Saved.Stock);
     }
 }

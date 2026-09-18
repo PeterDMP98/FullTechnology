@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -29,6 +30,15 @@
     <ProjectReference Include="..\..\Backend\FULLTECHNOLOGY.Application\FULLTECHNOLOGY.Application.csproj" />
     <ProjectReference Include="..\..\Backend\FULLTECHNOLOGY.Domain\FULLTECHNOLOGY.Domain.csproj" />
     <ProjectReference Include="..\..\Backend\FULLTECHNOLOGY.Infrastructure\FULLTECHNOLOGY.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WinForms añade these global usings que chocan con Avalonia (Color, Control, etc.).
+         Se quitan del ámbito global; InvoicePrinter las importa explícitamente. -->
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Drawing.Drawing2D" />
+    <Using Remove="System.Drawing.Printing" />
+    <Using Remove="System.Windows.Forms" />
   </ItemGroup>
 <ItemGroup>
     <InternalsVisibleTo Include="FULLTECHNOLOGY.Presentation.Tests" />

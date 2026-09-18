@@ -106,16 +106,23 @@
                     <!-- Encabezado de columnas -->
                     <!-- Columnas dinámicas del cierre, generadas por el VM en "Columns". -->
                     <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
-                        <ItemsControl ItemsSource="{Binding Columns}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <TextBlock Classes="TableHeader" Text="{Binding}" MinWidth="96" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <Grid>
+                            <ItemsControl x:Name="HeaderCells" ItemsSource="{Binding Columns}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <TextBlock Classes="TableHeader" Text="{Binding}" Width="110" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <!-- Capa transparente: arrastrar cerca de un borde de columna la redimensiona, como Excel. -->
+                            <Border Background="Transparent" Cursor="SizeWestEast"
+                                    PointerPressed="OnCierreHeaderPressed"
+                                    PointerMoved="OnCierreHeaderMoved"
+                                    PointerReleased="OnCierreHeaderReleased" />
+                        </Grid>
                     </Border>
 
                     <!-- Filas del catálogo -->
@@ -129,15 +136,16 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="m:CierreRowViewModel">
-                                        <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}"
-                                                Background="{Binding EsTotal, Converter={StaticResource TotalHighlight}}">
+<Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}"
+                                                        Background="{Binding EsTotal, Converter={StaticResource TotalHighlight}}"
+                                                        Loaded="OnCierreRowLoaded" Unloaded="OnCierreRowUnloaded">
                                             <ItemsControl ItemsSource="{Binding Cells}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="m:CierreCellViewModel">
-                                                        <TextBlock Classes="TableCell" Text="{Binding Value}" MinWidth="96" />
+                                                        <TextBlock Classes="TableCell" Text="{Binding Value}" Width="110" />
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>

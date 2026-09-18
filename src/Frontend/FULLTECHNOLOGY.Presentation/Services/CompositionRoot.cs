@@ -22,6 +22,15 @@ public static class CompositionRoot
 {
     public static IServiceProvider Build()
     {
+        // El esquema se crea/migra ANTES de registrar nada: la BD existente en
+        // %LOCALAPPDATA%\DecoTechnology\DecoTechnology.db puede ser de una versión
+        // anterior y carecer de columnas nuevas (ClienteId/CustomerDoc y, en v3.5,
+        // StatusChangedAt). SchemaInitializer es idempotente (CREATE IF NOT EXISTS
+        // + ALTER condicional + backfill), así que arrancar contra datos reales
+        // siempre queda con el esquema vigente sin tocar la información existente.
+        var dbFactory = new SqliteConnectionFactory();
+        SchemaInitializer.Initialize(dbFactory);
+
         var services = new ServiceCollection();
 
         // --- Infrastructure ---
@@ -29,7 +38,7 @@ public static class CompositionRoot
         services.AddSingleton<ISettingsStore>(sp => sp.GetRequiredService<SettingsStore>());
         services.AddSingleton<ICurrencyStore>(sp => new CurrencyStore(sp.GetRequiredService<ISettingsStore>()));
         services.AddSingleton<IBusinessInfoStore>(sp => new BusinessInfoStore(sp.GetRequiredService<ISettingsStore>()));
-        services.AddSingleton<SqliteConnectionFactory>();
+        services.AddSingleton<SqliteConnectionFactory>(dbFactory);
         services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
 
         services.AddSingleton<IServiceOrderRepository>(sp => new ServiceOrderRepository(sp.GetRequiredService<SqliteConnectionFactory>()));
@@ -48,6 +57,8 @@ public static class CompositionRoot
         services.AddSingleton<InventoryService>();
         services.AddSingleton<SalesService>();
         services.AddSingleton<AccountingService>();
+        services.AddSingleton<AlertsSettingsService>();
+        services.AddSingleton<DashboardService>();
 
         // --- Presentation ---
         services.AddSingleton<IShellPageFactory, ShellPageFactory>();
@@ -58,6 +69,7 @@ public static class CompositionRoot
         services.AddSingleton<MainWindow>();
 
         // --- Módulos (F9/F10): Mantenimiento, Clientes, Inventario y diálogos de negocio ---
+        services.AddTransient<InicioViewModel>();
         services.AddTransient<MantenimientoViewModel>();
         services.AddTransient<ClientesViewModel>();
         services.AddTransient<InventarioViewModel>();

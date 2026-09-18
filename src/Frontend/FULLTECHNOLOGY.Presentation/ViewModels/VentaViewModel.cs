@@ -5,11 +5,14 @@ using CommunityToolkit.Mvvm.Input;
 using FULLTECHNOLOGY.Application.Services;
 using FULLTECHNOLOGY.Domain;
 using FULLTECHNOLOGY.Domain.Entities;
+using FULLTECHNOLOGY.Infrastructure.Reporting;
 using FULLTECHNOLOGY.Presentation.Services;
 using FULLTECHNOLOGY.Presentation.ViewModels.Dialogs;
 using FULLTECHNOLOGY.Presentation.ViewModels.Venta;
 using FULLTECHNOLOGY.Presentation.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
+// Alias con nombre propio: el namespace ...ViewModels.Venta gana la búsqueda del nombre 'Venta'.
+using VentaFactura = FULLTECHNOLOGY.Domain.Entities.Venta;
 
 namespace FULLTECHNOLOGY.Presentation.ViewModels;
 
@@ -33,6 +36,10 @@ public partial class VentaViewModel : ViewModelBase, IRefreshable
     private int _version;
 
     public string Subtitle => "Punto de venta de accesorios con carrito.";
+
+    // Se dispara al grabarse una venta (venta + líneas ya congeladas); la vista
+    // u otros suscriptores pueden reaccionar (p. ej. recargar cierres de caja).
+    public event Action<VentaFactura, IReadOnlyList<InvoiceReport.Linea>>? VentaCompletada;
 
     public ObservableCollection<ProductoVentaRowViewModel> Rows { get; } = new();
     public ObservableCollection<CartItemViewModel> CartItems { get; } = new();
@@ -247,16 +254,42 @@ public partial class VentaViewModel : ViewModelBase, IRefreshable
         try
         {
             var items = CartItems.Select(i => new SaleItem(i.Producto.Id, i.Cantidad)).ToList();
+            // Las líneas se congelan del carrito (precio exportado del producto) antes de vaciarlo.
+            var lineas = CartItems.Select(i => new InvoiceReport.Linea(i.Producto.Nombre, i.Cantidad, i.Producto.PrecioVenta)).ToList();
             var venta = _sales.CreateSale(items, DescuentoActual, pagoVm.SelectedMetodo, ClienteId, ClienteNombre);
             await LimpiarCarrito();
             Reload();
-            await _dialogs.ShowMessageAsync("Confirmación de compra",
-                $"Compra confirmada.\n\nFactura: {venta.VentaNumber}\nTotal: {_currency.Fmt(venta.Total)}\nMedio: {pagoVm.SelectedMetodo}");
+            await MostrarFacturaAsync(venta, lineas);
         }
         catch (Exception ex)
         {
             // Fallo de regla de negocio o de BD: se informa y el carrito queda intacto.
             await _dialogs.ShowMessageAsync("No se pudo registrar la venta", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Al concluir la compra: notifica a los suscriptores, genera la factura en PDF
+    /// (Documentos\Facturas) y muestra la previsualización con opción de imprimirla.
+    /// En modo headless (pruebas) solo se notifica y se deja el PDF para el entorno real.
+    /// </summary>
+    private async Task MostrarFacturaAsync(VentaFactura venta, IReadOnlyList<InvoiceReport.Linea> lineas)
+    {
+        VentaCompletada?.Invoke(venta, lineas);
+        if (DialogService.OwnerWindow is null) return;
+
+        try
+        {
+            var pdf = InvoiceReport.SaveInvoicePdf(venta.VentaNumber, venta.ClienteNombre, venta.Fecha,
+                venta.MetodoPago, lineas, venta.Subtotal, venta.Descuento, venta.Total);
+            var preview = new InvoicePreviewViewModel(venta, lineas, _currency, pdf);
+            var win = new InvoicePreviewDialogView { DataContext = preview };
+            await win.ShowDialog<bool>(DialogService.OwnerWindow!);
+        }
+        catch (Exception ex)
+        {
+            await _dialogs.ShowMessageAsync("Factura",
+                $"La compra {venta.VentaNumber} se registró, pero no se pudo generar la factura.\nDetalle: {ex.Message}");
         }
     }
 

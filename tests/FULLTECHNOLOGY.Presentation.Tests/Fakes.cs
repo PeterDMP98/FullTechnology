@@ -269,6 +269,9 @@ public sealed class FakeVentaRepository : IVentaRepository
             .SelectMany(v => Detalles.Where(d => d.VentaId == v.Id).Select(d => (v, d)))
             .ToList();
     }
+
+    public List<VentaDetalle> GetVentaConLineas(long ventaId) =>
+        Detalles.Where(d => d.VentaId == ventaId).OrderBy(d => d.Id).ToList();
 }
 
 /// <summary>Fake del repo contable: cobros y series de balance en memoria para la gráfica.</summary>
@@ -344,6 +347,7 @@ public sealed class StubDialogService : IDialogService
     public bool ConfirmResult { get; set; } = true;
     public string? PromptResult { get; set; }
     public List<string> Messages { get; } = new();
+    public List<string> Lists { get; } = new();
 
     public Task ShowMessageAsync(string title, string message)
     {
@@ -355,6 +359,12 @@ public sealed class StubDialogService : IDialogService
 
     public Task<string?> PromptAsync(string title, string message, string initial = "") =>
         Task.FromResult<string?>(PromptResult ?? initial);
+
+    public Task ShowListAsync(string title, string subtitle, IReadOnlyList<AlertRowItem> rows)
+    {
+        Lists.Add($"{title} ({rows.Count}): {subtitle}");
+        return Task.CompletedTask;
+    }
 }
 
 /// <summary>Harness reutilizable: fakes, servicios reales y provider de DI.</summary>
@@ -380,6 +390,8 @@ public sealed class TestHarness
     public AccountingService AccountingSvc { get; }
     public CurrencyService CurrencySvc { get; }
     public BusinessSettingsService SettingsSvc { get; }
+    public AlertsSettingsService AlertsSvc { get; }
+    public DashboardService DashboardSvc { get; }
     public ThemeService ThemeSvc { get; }
 
     public ServiceProvider Services { get; }
@@ -394,6 +406,8 @@ public sealed class TestHarness
         CurrencySvc = new CurrencyService(Currency);
         AccountingSvc = new AccountingService(Ventas, AccountingRepo, CurrencySvc);
         SettingsSvc = new BusinessSettingsService(Business, Settings, CurrencySvc);
+        AlertsSvc = new AlertsSettingsService(Settings);
+        DashboardSvc = new DashboardService(Productos, Orders, AlertsSvc);
         ThemeSvc = new ThemeService(SettingsSvc);
         Services = new ServiceCollection()
             .AddSingleton(OrdersSvc)
@@ -404,6 +418,8 @@ public sealed class TestHarness
             .AddSingleton(AccountingSvc)
             .AddSingleton(CurrencySvc)
             .AddSingleton(SettingsSvc)
+            .AddSingleton(AlertsSvc)
+            .AddSingleton(DashboardSvc)
             .AddSingleton(ThemeSvc)
             .AddSingleton<IDialogService>(Dialogs)
             .AddSingleton<IDatabaseBackupService>(Backup)
@@ -435,7 +451,7 @@ public sealed class TestHarness
         new(SalesSvc, CurrencySvc, Dialogs);
 
     public ConfigurationViewModel CreateConfigurationVm() =>
-        new(SettingsSvc, ThemeSvc, Dialogs, Backup);
+        new(SettingsSvc, ThemeSvc, Dialogs, Backup, AlertsSvc);
 
     public Cliente SeedCliente(string nombre, string tipo = CustomerTypes.Comprador, string doc = "", string cel = "", string dir = "", string web = "", string red = "") =>
         Clientes.Add(new Cliente

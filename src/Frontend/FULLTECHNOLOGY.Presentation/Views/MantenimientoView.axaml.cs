@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using FULLTECHNOLOGY.Presentation.Services;
 using FULLTECHNOLOGY.Presentation.ViewModels;
 using FULLTECHNOLOGY.Presentation.ViewModels.Mantenimiento;
 
@@ -9,10 +10,17 @@ namespace FULLTECHNOLOGY.Presentation.Views;
 
 public partial class MantenimientoView : UserControl
 {
+    private ColumnResizer? _resizer;
+
     public MantenimientoView()
     {
         InitializeComponent();
+        _resizer = ColumnResizer.Enable(HeaderGrid, new double[] { 80, 100, 80, 80, 90, 90, 80, 80, 80, 70 });
     }
+
+    private void OnRowLoaded(object? sender, RoutedEventArgs e) => _resizer?.AddRow(sender as Grid);
+
+    private void OnRowUnloaded(object? sender, RoutedEventArgs e) => _resizer?.RemoveRow(sender as Grid);
 
     /// <summary>
     /// Menú contextual de acciones por fila (Editar / Editar diagnóstico /

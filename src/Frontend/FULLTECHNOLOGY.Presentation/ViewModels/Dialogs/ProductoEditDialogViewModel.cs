@@ -44,10 +44,10 @@ public partial class ProductoEditDialogViewModel : ViewModelBase
     public partial string Nombre { get; set; } = "";
 
     [ObservableProperty]
-    public partial decimal Costo { get; set; }
+    public partial decimal? Costo { get; set; } = 0m;
 
     [ObservableProperty]
-    public partial decimal PrecioVenta { get; set; }
+    public partial decimal? PrecioVenta { get; set; } = 0m;
 
     [ObservableProperty]
     public partial string Proveedor { get; set; } = "";
@@ -62,7 +62,7 @@ public partial class ProductoEditDialogViewModel : ViewModelBase
     public partial string Ubicado { get; set; } = "";
 
     [ObservableProperty]
-    public partial decimal Stock { get; set; }
+    public partial decimal? Stock { get; set; } = 0m;
 
     /// <summary>Producto persistido tras guardar con éxito.</summary>
     public Producto? Saved { get; private set; }
@@ -109,13 +109,13 @@ public partial class ProductoEditDialogViewModel : ViewModelBase
                 Codigo = _codigo,
                 Nombre = Nombre.Trim(),
                 Tipo = SelectedTipo,
-                Costo = Costo,
-                PrecioVenta = PrecioVenta,
+                Costo = Costo ?? 0m,
+                PrecioVenta = PrecioVenta ?? 0m,
                 Proveedor = BlankOrNull(Proveedor),
                 FechaIngreso = _fechaIngreso,
                 Garantia = BlankOrNull(Garantia),
                 Ubicado = BlankOrNull(Ubicado),
-                Stock = (int)Stock
+                Stock = (int)(Stock ?? 0m)
             };
             _inventory.Save(producto);
             Saved = producto;

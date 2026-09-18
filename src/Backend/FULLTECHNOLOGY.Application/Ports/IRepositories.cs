@@ -59,6 +59,8 @@ public interface IVentaRepository
     List<Venta> GetVentas(DateTime? from = null, DateTime? to = null, string? metodo = null, string? search = null);
     // Aplanado venta+línea para contabilidad: el cierre cuenta cada línea con su cabecera.
     List<(Venta venta, VentaDetalle linea)> GetVentasConLineas(DateTime from, DateTime to, string? metodo = null);
+    // Líneas de una venta concreta (para reimprimir/exportar una factura del historial).
+    List<VentaDetalle> GetVentaConLineas(long ventaId);
 }
 
 /// <summary>Consultas de contabilidad/cierre; agregan por método, día y totales del periodo en SQL.</summary>

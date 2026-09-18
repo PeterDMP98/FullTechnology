@@ -33,6 +33,10 @@ public class SalesService
     public List<(Venta venta, VentaDetalle linea)> SearchWithLines(DateTime from, DateTime to, string? metodo = null) =>
         _ventas.GetVentasConLineas(from, to, metodo);
 
+    // Líneas de una venta concreta (reimpresión/exportación de una factura del historial).
+    public List<VentaDetalle> GetVentaLineas(long ventaId) =>
+        _ventas.GetVentaConLineas(ventaId);
+
     public Venta CreateSale(IEnumerable<SaleItem> items, decimal descuento, string metodoPago, long? clienteId = null, string? clienteNombre = null)
     {
         // Se descartan nulos por seguridad y se exige al menos un ítem antes de tocar la BD.

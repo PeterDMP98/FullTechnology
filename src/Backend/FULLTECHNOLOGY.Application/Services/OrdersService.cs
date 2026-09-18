@@ -46,6 +46,11 @@ public class OrdersService
     {
         order.Validate();
 
+        // Estado anterior (null en órdenes nuevas): permite detectar un cambio de
+        // estado y sellar StatusChangedAt, base de las alertas de tiempo del Inicio.
+        var previous = order.Id == 0 ? null : _orders.Get(order.Id);
+        var statusChanged = previous is null || previous.Status != order.Status;
+
         // Sólo en órdenes NUEVAS sin cliente se autovincula un comprador existente (doc/celular), como v2.
         if (order.Id == 0 && order.ClienteId == null)
             LinkComprador(order);
@@ -58,6 +63,10 @@ public class OrdersService
             if (string.IsNullOrWhiteSpace(order.Status))
                 order.Status = RepairStatuses.Recibido;
         }
+
+        // Fecha del último cambio de estado: al crear (Recibido) o cuando el estado muta.
+        if (order.Id == 0 || statusChanged)
+            order.StatusChangedAt = DateTime.Now;
 
         _orders.Save(order);
 
@@ -92,6 +101,7 @@ public class OrdersService
         var o = _orders.Get(id) ?? throw new EntityNotFoundException($"No existe la orden {id}.");
         o.Status = RepairStatuses.Entregado;
         o.DeliveredAt = DateTime.Now;
+        o.StatusChangedAt = DateTime.Now;
         _orders.Save(o);
     }
 

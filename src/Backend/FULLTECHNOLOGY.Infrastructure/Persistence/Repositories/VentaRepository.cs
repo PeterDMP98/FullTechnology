@@ -185,4 +185,32 @@ public sealed class VentaRepository : IVentaRepository
         }
         return list;
     }
+
+    /// <summary>
+    /// Líneas de detalle de una venta concreta, en orden de inserción: alimenta la
+    /// reimpresión/exportación de la factura del historial (misma foto congelada de
+    /// nombre, precio y cantidad que tenía al momento de facturar).
+    /// </summary>
+    public List<VentaDetalle> GetVentaConLineas(long ventaId)
+    {
+        var list = new List<VentaDetalle>();
+        using var c = _factory.CreateConnection();
+        using var cmd = c.CreateCommand();
+        cmd.CommandText = "SELECT Id, VentaId, ProductoId, NombreProducto, PrecioVenta, Cantidad FROM VentaDetalles WHERE VentaId=@vi ORDER BY Id";
+        cmd.Parameters.AddWithValue("@vi", ventaId);
+        using var r = cmd.ExecuteReader();
+        while (r.Read())
+        {
+            list.Add(new VentaDetalle
+            {
+                Id = r.GetInt64(0),
+                VentaId = r.GetInt64(1),
+                ProductoId = r.GetInt64(2),
+                ProductoNombre = r.IsDBNull(3) ? "" : r.GetString(3),
+                PrecioUnitario = r.GetDecimal(4),
+                Cantidad = r.GetInt32(5)
+            });
+        }
+        return list;
+    }
 }

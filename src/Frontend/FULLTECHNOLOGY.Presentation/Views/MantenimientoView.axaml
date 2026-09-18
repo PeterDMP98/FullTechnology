@@ -111,24 +111,24 @@
             <!-- Un solo ScrollViewer horizontal mantiene header + filas alineados al scroll
                  (TreeDataGrid #256); el ancho mínimo de columna se fija en ColumnDefinition -->
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <Grid MinWidth="990" RowDefinitions="Auto,*">
+                <Grid MinWidth="1240" RowDefinitions="Auto,*">
 
                     <!-- Header de columnas (orden por click) -->
                     <!-- Cada columna es un botón que dispara SortByColumnCommand con el enum SortColumn
                          como parámetro; la flecha de dirección (Arrow*) se pinta en acento claro. -->
                     <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
-                        <Grid>
+                        <Grid x:Name="HeaderGrid">
 <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160" />
+                            <ColumnDefinition Width="*" MinWidth="280" />
                             <ColumnDefinition Width="130" />
-                            <ColumnDefinition Width="*" MinWidth="120" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" MinWidth="220" />
+                            <ColumnDefinition Width="*" MinWidth="170" />
+                            <ColumnDefinition Width="120" />
                             <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="*" MinWidth="120" />
-                            <ColumnDefinition Width="*" MinWidth="110" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="130" />
                         </Grid.ColumnDefinitions>
                         <Button Background="Transparent" Padding="0" HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Left"
@@ -220,18 +220,18 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vmm:OrderRowViewModel">
                                         <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
-                                            <Grid>
+                                            <Grid Loaded="OnRowLoaded" Unloaded="OnRowUnloaded">
 <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="160" />
+                                                <ColumnDefinition Width="*" MinWidth="280" />
                                                 <ColumnDefinition Width="130" />
-                                                <ColumnDefinition Width="*" MinWidth="120" />
+                                                <ColumnDefinition Width="120" />
+                                                <ColumnDefinition Width="*" MinWidth="220" />
+                                                <ColumnDefinition Width="*" MinWidth="170" />
+                                                <ColumnDefinition Width="120" />
                                                 <ColumnDefinition Width="110" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="*" MinWidth="120" />
-                                                <ColumnDefinition Width="*" MinWidth="110" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="130" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding OrderNumber}" Classes="TableCell"
                                                        Foreground="{DynamicResource AccentPrimaryLight}" FontWeight="SemiBold"

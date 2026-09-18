@@ -1,5 +1,6 @@
 // InventarioViewModel.cs — Módulo de inventario: listado de productos con filtro por tipo y búsqueda en vivo, más alta/edición/eliminación vía diálogo.
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -54,6 +55,25 @@ public partial class InventarioViewModel : ViewModelBase, IRefreshable
     [ObservableProperty]
     public partial int TotalRows { get; set; }
 
+    // Datos de exportación a PDF/Excel (encabezados, anchos y filas ya formateadas).
+    [ObservableProperty]
+    public partial string[] ExportHeaders { get; set; } = Array.Empty<string>();
+
+    [ObservableProperty]
+    public partial float[] ExportWidths { get; set; } = Array.Empty<float>();
+
+    [ObservableProperty]
+    public partial IReadOnlyList<string[]> ExportRows { get; set; } = Array.Empty<string[]>();
+
+    [ObservableProperty]
+    public partial string ExportTitle { get; set; } = "INVENTARIO";
+
+    [ObservableProperty]
+    public partial string ExportSublinea { get; set; } = "";
+
+    [ObservableProperty]
+    public partial string FileNameBase { get; set; } = "Inventario";
+
     public InventarioViewModel(
         InventoryService inventory,
         CurrencyService currency,
@@ -99,6 +119,20 @@ public partial class InventarioViewModel : ViewModelBase, IRefreshable
                     prod => { _ = EliminarAsync(prod); }));
             TotalRows = Rows.Count;
             IsEmpty = Rows.Count == 0;
+
+            // Catálogo listo para exportar: números en formato invariante para que
+            // PDF/Excel los escriban como valores numéricos y se puedan reimportar.
+            ExportHeaders = new[] { "Código", "Nombre", "Tipo", "Costo", "Precio venta", "Proveedor", "Ingreso", "Garantía", "Ubicado", "Stock" };
+            ExportWidths = new[] { 90f, 150f, 80f, 80f, 90f, 120f, 80f, 70f, 80f, 60f };
+            ExportRows = data.Select(p => new[]
+            {
+                p.Codigo, p.Nombre, p.Tipo,
+                Num(p.Costo), Num(p.PrecioVenta),
+                p.Proveedor ?? "", p.FechaIngreso.ToString("yyyy-MM-dd"),
+                p.Garantia ?? "", p.Ubicado ?? "",
+                p.Stock.ToString(CultureInfo.InvariantCulture)
+            }).ToList();
+            ExportSublinea = $"{DateTime.Today:dd/MM/yyyy} · {data.Count} productos";
             IsLoading = false;
         }
         catch (Exception ex)
@@ -141,4 +175,44 @@ public partial class InventarioViewModel : ViewModelBase, IRefreshable
         var win = new ProductoEditDialogView { DataContext = vm };
         return await win.ShowDialog<bool>(DialogService.OwnerWindow!);
     }
+
+    // ---- Importación (los archivos los lee la vista; el VM aplica) ----
+    // Carga o actualiza productos desde el archivo importado: si el código ya
+    // existe se actualiza el producto; si no, se da de alta. Recarga la lista.
+    public (int nuevos, int actualizados) AplicarImportacion(IReadOnlyList<Producto> import)
+    {
+        int nuevos = 0, actualizados = 0;
+        foreach (var p in import.Where(x => !string.IsNullOrWhiteSpace(x.Nombre)))
+        {
+            // Sanea lo que venga del archivo para no fallar la validación del dominio.
+            p.Tipo = p.Tipo == ProductTypes.Repuesto ? ProductTypes.Repuesto : ProductTypes.Accesorio;
+            p.Costo = Math.Max(0, p.Costo);
+            p.PrecioVenta = Math.Max(0, p.PrecioVenta);
+            p.Stock = Math.Max(0, p.Stock);
+
+            var existente = string.IsNullOrWhiteSpace(p.Codigo)
+                ? null
+                : _inventory.Search(null, p.Codigo).FirstOrDefault(x => x.Codigo == p.Codigo);
+            if (existente is null)
+            {
+                _inventory.Save(p);
+                nuevos++;
+            }
+            else
+            {
+                existente.Nombre = p.Nombre;
+                existente.Tipo = p.Tipo;
+                existente.Costo = p.Costo;
+                existente.PrecioVenta = p.PrecioVenta;
+                existente.Stock = p.Stock;
+                _inventory.Save(existente);
+                actualizados++;
+            }
+        }
+        Reload();
+        return (nuevos, actualizados);
+    }
+
+    // Números en formato invariante para el export (PDF/Excel y reimportación).
+    private static string Num(decimal v) => v.ToString("0.##", CultureInfo.InvariantCulture);
 }

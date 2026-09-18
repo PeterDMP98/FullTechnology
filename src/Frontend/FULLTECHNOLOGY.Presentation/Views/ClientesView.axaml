@@ -54,20 +54,20 @@
                 CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
             <!-- Un solo ScrollViewer horizontal mantiene header + filas alineados (TreeDataGrid #256) -->
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <Grid MinWidth="900" RowDefinitions="Auto,*">
+                <Grid MinWidth="1200" RowDefinitions="Auto,*">
 
                     <!-- Header de columnas -->
                     <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
-                        <Grid>
+                        <Grid x:Name="HeaderGrid">
 <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="*" MinWidth="140" />
                             <ColumnDefinition Width="140" />
+                            <ColumnDefinition Width="*" MinWidth="260" />
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="*" MinWidth="240" />
                             <ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="*" MinWidth="130" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="80" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Classes="TableHeader" Text="Tipo" />
                         <TextBlock Grid.Column="1" Classes="TableHeader" Text="Nombre" />
@@ -94,16 +94,16 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vmm:ClienteRowViewModel">
                                         <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
-                                            <Grid>
+                                            <Grid Loaded="OnRowLoaded" Unloaded="OnRowUnloaded">
 <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="110" />
-                                                <ColumnDefinition Width="*" MinWidth="140" />
                                                 <ColumnDefinition Width="140" />
+                                                <ColumnDefinition Width="*" MinWidth="260" />
+                                                <ColumnDefinition Width="170" />
+                                                <ColumnDefinition Width="130" />
+                                                <ColumnDefinition Width="*" MinWidth="240" />
                                                 <ColumnDefinition Width="120" />
-                                                <ColumnDefinition Width="*" MinWidth="130" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="110" />
-                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="130" />
+                                                <ColumnDefinition Width="80" />
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                                 <Ellipse Width="8" Height="8"

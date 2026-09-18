@@ -3,6 +3,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls;
+using FULLTECHNOLOGY.Presentation.ViewModels.Dialogs;
 using FULLTECHNOLOGY.Presentation.Views.Dialogs;
 using AvaloniaApp = Avalonia.Application;
 
@@ -20,7 +21,13 @@ public interface IDialogService
     Task<bool> ConfirmAsync(string title, string message);
 
     Task<string?> PromptAsync(string title, string message, string initial = "");
+
+    /// <summary>Ventana flotante con una lista de ítems (alertas del Inicio).</summary>
+    Task ShowListAsync(string title, string subtitle, IReadOnlyList<AlertRowItem> rows);
 }
+
+/// <summary>Fila de la ventana de lista: glifo, línea principal (negrita) y línea secundaria.</summary>
+public sealed record AlertRowItem(string Glyph, string Linea1, string Linea2);
 
 public class DialogService : IDialogService
 {
@@ -43,5 +50,11 @@ public class DialogService : IDialogService
     {
         var r = await MessageDialog.ShowAsync(FindOwner(), title, message, allowCancel: true, initial: initial);
         return r.Ok ? r.Text : null;
+    }
+
+    public async Task ShowListAsync(string title, string subtitle, IReadOnlyList<AlertRowItem> rows)
+    {
+        var win = new AlertListDialogView { DataContext = new AlertListDialogViewModel(title, subtitle, rows) };
+        await win.ShowDialog(FindOwner()!);
     }
 }

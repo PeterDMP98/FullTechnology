@@ -1,0 +1,81 @@
+<!-- InvoicePreviewDialogView.axaml — Previsualización de la factura al terminar la compra: resumen, ítems y botones Imprimir (selección de impresora) / Cancelar. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.InvoicePreviewDialogView"
+        x:DataType="vm:InvoicePreviewViewModel"
+        Title="{Binding Title}"
+        Width="560" Height="520" MinWidth="520" MinHeight="420"
+        WindowStartupLocation="CenterOwner" CanResize="True"
+        Icon="/Assets/avalonia-logo.ico"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: Cancelar / Imprimir factura con handlers de code-behind. -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Secondary" Content="Cancelar" Click="OnCancel" />
+                <Button Classes="Primary" Content="Imprimir factura" Click="OnImprimir" />
+            </StackPanel>
+        </Border>
+
+        <!-- Resumen de la venta: datos de cabecera, tabla de ítems y totales. -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="24" Spacing="12">
+
+                <StackPanel Spacing="2">
+                    <TextBlock Text="{Binding Title}" FontSize="{DynamicResource FontSizeTitle}"
+                               FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}" />
+                    <TextBlock Text="{Binding FechaText}" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
+                    <TextBlock Text="{Binding ClienteText}" Foreground="{DynamicResource TextPrimary}" />
+                    <TextBlock Text="{Binding MedioText}" Foreground="{DynamicResource TextPrimary}" />
+                </StackPanel>
+
+                <!-- Detalle de la factura con las cabeceras de columnas. -->
+                <Grid ColumnDefinitions="*,52,90,90" Margin="0,4,0,0">
+                    <TextBlock Text="Descripción" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" FontSize="11" />
+                    <TextBlock Grid.Column="1" Text="Cant" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" FontSize="11" TextAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="Precio" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" FontSize="11" TextAlignment="Right" />
+                    <TextBlock Grid.Column="3" Text="Total" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" FontSize="11" TextAlignment="Right" />
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding Lineas}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:InvoiceLineaViewModel">
+                            <Grid ColumnDefinitions="*,52,90,90">
+                                <TextBlock Text="{Binding Nombre}" Foreground="{DynamicResource TextPrimary}" FontSize="12" TextWrapping="Wrap" />
+                                <TextBlock Grid.Column="1" Text="{Binding Cantidad}" Foreground="{DynamicResource TextPrimary}" FontSize="12" TextAlignment="Center" />
+                                <TextBlock Grid.Column="2" Text="{Binding Precio}" Foreground="{DynamicResource TextPrimary}" FontSize="12" TextAlignment="Right" />
+                                <TextBlock Grid.Column="3" Text="{Binding Total}" Foreground="{DynamicResource TextPrimary}" FontSize="12" TextAlignment="Right" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Separator />
+
+                <StackPanel Spacing="2" HorizontalAlignment="Right">
+                    <Grid ColumnDefinitions="90,120">
+                        <TextBlock Text="Subtotal:" Foreground="{DynamicResource TextSecondary}" TextAlignment="Right" />
+                        <TextBlock Grid.Column="1" Text="{Binding SubtotalText}" Foreground="{DynamicResource TextPrimary}" TextAlignment="Right" />
+                    </Grid>
+                    <Grid ColumnDefinitions="90,120">
+                        <TextBlock Text="Descuento:" Foreground="{DynamicResource TextSecondary}" TextAlignment="Right" />
+                        <TextBlock Grid.Column="1" Text="{Binding DescuentoText}" Foreground="{DynamicResource TextPrimary}" TextAlignment="Right" />
+                    </Grid>
+                    <Grid ColumnDefinitions="90,120">
+                        <TextBlock Text="TOTAL:" FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" TextAlignment="Right" />
+                        <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}" TextAlignment="Right" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- Ruta del PDF generado al cerrar la compra. -->
+                <Separator />
+                <TextBlock Text="{Binding PdfText}" Foreground="{DynamicResource TextSecondary}" FontSize="10"
+                           TextWrapping="Wrap" TextTrimming="None" />
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+
+</Window>

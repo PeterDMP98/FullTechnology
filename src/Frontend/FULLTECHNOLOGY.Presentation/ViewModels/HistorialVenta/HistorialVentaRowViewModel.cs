@@ -16,6 +16,7 @@ public class HistorialVentaRowViewModel : ViewModelBase
 
     public Sale Venta { get; }
     public ICommand VerCommand { get; }
+    public ICommand ImprimirCommand { get; }
 
     // Columnas expuestas planas para el binding de la tabla.
     public string Factura => Venta.VentaNumber;
@@ -36,10 +37,11 @@ public class HistorialVentaRowViewModel : ViewModelBase
         $"TOTAL: {Total}\n" +
         $"Medio: {Medio}";
 
-    public HistorialVentaRowViewModel(Sale venta, CurrencyService currency, ICommand verCommand)
+    public HistorialVentaRowViewModel(Sale venta, CurrencyService currency, ICommand verCommand, ICommand imprimirCommand)
     {
         Venta = venta;
         _currency = currency;
         VerCommand = verCommand;
+        ImprimirCommand = imprimirCommand;
     }
 }

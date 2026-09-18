@@ -1,0 +1,59 @@
+<!-- AlertListDialogView.axaml — Ventana flotante de detalle de alertas (Inicio): subtítulo descriptivo y lista de ítems con glifo + dos líneas de texto. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FULLTECHNOLOGY.Presentation.ViewModels.Dialogs"
+        xmlns:svc="using:FULLTECHNOLOGY.Presentation.Services"
+        x:Class="FULLTECHNOLOGY.Presentation.Views.Dialogs.AlertListDialogView"
+        x:DataType="vm:AlertListDialogViewModel"
+        Title="{Binding Title}"
+        Width="560" MinWidth="520" Height="480" MinHeight="360"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgApp}">
+
+    <DockPanel>
+        <!-- Pie de acciones: botón Cerrar (handler en code-behind). -->
+        <Border DockPanel.Dock="Bottom" Padding="{DynamicResource PaddingDialogFooter}" Background="{DynamicResource BgSidebar}"
+                BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Classes="Primary" Content="Cerrar" Click="OnCancel" />
+            </StackPanel>
+        </Border>
+
+        <Grid RowDefinitions="Auto,*" RowSpacing="12" Margin="24,20,24,16">
+            <TextBlock Text="{Binding Subtitle}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}" />
+
+            <Border Grid.Row="1" Background="{DynamicResource BgCard}"
+                    CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="svc:AlertRowItem">
+                                <Border BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,0,0,1" Padding="{DynamicResource PaddingTableRow}">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                        <Border Width="40" Height="40" CornerRadius="{DynamicResource RadiusButton}"
+                                                Background="{DynamicResource BgRowAlt}" VerticalAlignment="Top">
+                                            <TextBlock Text="{Binding Glyph}" FontSize="{DynamicResource FontSizeIcon}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="{Binding Linea1}" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Linea2}" FontSize="{DynamicResource FontSizeSubtitle}"
+                                                       Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </DockPanel>
+
+</Window>

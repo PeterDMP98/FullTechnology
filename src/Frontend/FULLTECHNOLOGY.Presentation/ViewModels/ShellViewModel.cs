@@ -133,6 +133,7 @@ public partial class ShellViewModel : ViewModelBase
         Subtitle = Current switch
         {
             PlaceholderViewModel p => p.Description,
+            InicioViewModel i => i.Subtitle,
             MantenimientoViewModel m => m.Subtitle,
             ConfigurationViewModel c => c.Subtitle,
             _ => ""

@@ -68,7 +68,7 @@
             <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Text="{Binding ResumenText}" FontSize="{DynamicResource FontSizeSubtitle}" VerticalAlignment="Center"
                            Foreground="{DynamicResource TextSecondary}" />
-                <TextBlock Grid.Column="1" Text="Doble clic o Ver para el detalle de la factura." FontSize="{DynamicResource FontSizeSubtitle}"
+                <TextBlock Grid.Column="1" Text="Usa el botón ⋯ para ver el detalle o imprimir la factura." FontSize="{DynamicResource FontSizeSubtitle}"
                            VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}" />
             </Grid>
         </Border>
@@ -78,19 +78,19 @@
         <Border Grid.Row="2" Background="{DynamicResource BgCard}" CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
             <!-- Un solo ScrollViewer horizontal mantiene header + filas alineados (TreeDataGrid #256) -->
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <Grid MinWidth="860" RowDefinitions="Auto,*">
+                <Grid MinWidth="1100" RowDefinitions="Auto,*">
                     <!-- Encabezado -->
                     <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
-                        <Grid>
+                        <Grid x:Name="HeaderGrid">
 <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140" />
+                            <ColumnDefinition Width="140" />
+                            <ColumnDefinition Width="*" MinWidth="260" />
                             <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="*" MinWidth="140" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="*" MinWidth="110" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" MinWidth="150" />
+                            <ColumnDefinition Width="80" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Classes="TableHeader" Text="Factura" VerticalAlignment="Center" />
                         <TextBlock Grid.Column="1" Classes="TableHeader" Text="Fecha" VerticalAlignment="Center" />
@@ -117,16 +117,16 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vmm:HistorialVentaRowViewModel">
                                         <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
-                                            <Grid>
+                                            <Grid Loaded="OnRowLoaded" Unloaded="OnRowUnloaded">
 <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="140" />
+                                                <ColumnDefinition Width="140" />
+                                                <ColumnDefinition Width="*" MinWidth="260" />
                                                 <ColumnDefinition Width="110" />
-                                                <ColumnDefinition Width="120" />
-                                                <ColumnDefinition Width="*" MinWidth="140" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="*" MinWidth="110" />
-                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="*" MinWidth="150" />
+                                                <ColumnDefinition Width="80" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding Factura}" Classes="TableCell"
                                                        Foreground="{DynamicResource AccentPrimaryLight}" FontWeight="SemiBold"
@@ -144,9 +144,10 @@
                                             <TextBlock Grid.Column="6" Text="{Binding Medio}" Classes="TableCell"
                                                        TextTrimming="CharacterEllipsis" />
                                             <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                                <Button Classes="Table" Width="60" Content="Ver"
-                                                        Command="{Binding VerCommand}" CommandParameter="{Binding}"
-                                                        ToolTip.Tip="Ver detalle de la factura" />
+                                                <!-- Botón de acciones sin texto (⋯): menú vía code-behind (Ver factura, en v3.6 también imprimir/PDF). -->
+                                                <Button Classes="Table" Width="44" Content="&#x22EF;"
+                                                        Click="OnOptionsClick" ToolTip.Tip="Acciones de la factura"
+                                                        auto:AutomationProperties.Name="Acciones de la factura" />
                                             </StackPanel>
                                         </Grid>
                                     </Border>

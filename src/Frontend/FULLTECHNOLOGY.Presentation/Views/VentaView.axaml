@@ -86,20 +86,20 @@
             <Border Grid.Row="1" Background="{DynamicResource BgCard}"
                     CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <Grid MinWidth="620" RowDefinitions="Auto,*">
+                <Grid MinWidth="1000" RowDefinitions="Auto,*">
 
                     <!-- Header de columnas del catálogo. -->
                     <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
-                        <Grid>
+                        <Grid x:Name="HeaderGrid">
 <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="70" />
-                            <ColumnDefinition Width="*" MinWidth="140" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" MinWidth="240" />
+                            <ColumnDefinition Width="110" />
                             <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="120" />
                             <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="110" />
                             <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="60" />
-                            <ColumnDefinition Width="90" />
-                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Classes="TableHeader" Text="Código" />
                         <TextBlock Grid.Column="1" Classes="TableHeader" Text="Nombre" />
@@ -124,16 +124,16 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vmm:ProductoVentaRowViewModel">
                                         <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
-                                            <Grid>
+                                            <Grid Loaded="OnRowLoaded" Unloaded="OnRowUnloaded">
 <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="70" />
-                                                <ColumnDefinition Width="*" MinWidth="140" />
+                                                <ColumnDefinition Width="120" />
+                                                <ColumnDefinition Width="*" MinWidth="240" />
+                                                <ColumnDefinition Width="110" />
                                                 <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="120" />
                                                 <ColumnDefinition Width="70" />
+                                                <ColumnDefinition Width="110" />
                                                 <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="60" />
-                                                <ColumnDefinition Width="90" />
-                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Classes="TableCell" Text="{Binding Codigo}"
                                                        Foreground="{DynamicResource AccentPrimaryLight}"

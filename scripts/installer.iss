@@ -1,9 +1,10 @@
 ; ============================================================
-; FULLTECHNOLOGY v3 — Script de Inno Setup (FASE 13 / ERR-014)
+; FULLTECHNOLOGY v3.5 — Script de Inno Setup (FASE 13 / ERR-014)
 ; Instalador .exe para Windows de la versión Avalonia self-contained.
 ; El publish win-x64 debe generarse antes con scripts\build-publish.ps1.
 ; Mismo AppId que el instalador WinForms -> actualiza en sitio (no huérfano).
-; La base de datos vive en %LOCALAPPDATA%\DecoTechnology y NO se toca al desinstalar.
+; La base de datos vive en %LOCALAPPDATA%\DecoTechnology y NO se toca al desinstalar
+; (la propia app aplica las migraciones del esquema v3.5 al arrancar).
 ; FULLTECHNOLOGY es la marca del software; el nombre del negocio se pide en el
 ; asistente y se guarda en settings.ini (businessName=), igual que en v2/v3.
 ; ============================================================
@@ -11,12 +12,12 @@
 [Setup]
 AppId={{DECO-TECH-2026-0001}
 AppName=FullTechnology
-AppVersion=3.2
+AppVersion=3.5
 AppPublisher=FULLTECHNOLOGY
 DefaultDirName={autopf}\DecoTechnology
 DefaultGroupName=FullTechnology
 OutputDir=..\installer
-OutputBaseFilename=FullTechnology_Setup_v3.2
+OutputBaseFilename=FullTechnology_Setup_v3.5
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -33,7 +34,8 @@ Name: "desktopicon"; Description: "Crear acceso directo en el escritorio"; Group
 [Files]
 ; Publicación self-contained completa (Avalonia + .NET runtime + nativos SQLite/Skia).
 ; Ruta relativa al .iss dentro de scripts/ -> raíz del proyecto (FullTechnology/).
-Source: "..\src\Frontend\FULLTECHNOLOGY.Presentation\bin\Release\net10.0\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; TFM desde v3.5: net10.0-windows (requiere WinForms para imprimir facturas).
+Source: "..\src\Frontend\FULLTECHNOLOGY.Presentation\bin\Release\net10.0-windows\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 ; Acceso directo en el Menú Inicio

@@ -15,7 +15,7 @@
 
         <!-- ===================== TOOLBAR ===================== -->
         <!-- Barra superior: botón "+ Nuevo producto", combo de tipo y buscador con lupa. -->
-        <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="12" Height="{DynamicResource HeightToolbar}">
+        <Grid ColumnDefinitions="Auto,*,Auto,*,Auto" ColumnSpacing="12" Height="{DynamicResource HeightToolbar}">
             <Button Classes="Primary" Content="+ Nuevo producto"
                     Command="{Binding NuevoProductoCommand}"
                     HorizontalAlignment="Left" VerticalAlignment="Center" />
@@ -39,6 +39,18 @@
                            HorizontalAlignment="Right" VerticalAlignment="Center"
                            Margin="0,0,14,0" IsHitTestVisible="False" />
             </Grid>
+
+            <!-- Exportar (PDF/Excel) e importar desde archivo -->
+            <!-- Exporta el listado actual a PDF o Excel; "Importar" carga/actualiza
+                 productos desde un .xlsx o .csv (ambos resueltos en code-behind). -->
+            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <Button Classes="Secondary" Height="{DynamicResource HeightToolbar}" Click="OnExportPdf"
+                        ToolTip.Tip="Exportar el inventario a PDF">PDF</Button>
+                <Button Classes="Secondary" Height="{DynamicResource HeightToolbar}" Click="OnExportExcel"
+                        ToolTip.Tip="Exportar el inventario a Excel">Excel</Button>
+                <Button Classes="Secondary" Height="{DynamicResource HeightToolbar}" Click="OnImportClick"
+                        ToolTip.Tip="Importar inventario desde Excel o CSV">Importar</Button>
+            </StackPanel>
         </Grid>
 
         <!-- ===================== TABLA ===================== -->
@@ -47,24 +59,24 @@
                 CornerRadius="{DynamicResource RadiusCard}" ClipToBounds="True">
             <!-- Un solo ScrollViewer horizontal mantiene header + filas alineados (TreeDataGrid #256) -->
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <Grid MinWidth="940" RowDefinitions="Auto,*">
+                <Grid MinWidth="1280" RowDefinitions="Auto,*">
 
                     <!-- Header de columnas -->
                     <!-- Columnas alineadas: código, nombre, tipo (centro), costos (derecha), stock (centro) y opciones. -->
                     <Border Classes="TableHeader" Padding="{DynamicResource PaddingTableHeader}">
-                        <Grid>
+                        <Grid x:Name="HeaderGrid">
 <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="90" />
-                            <ColumnDefinition Width="*" MinWidth="120" />
-                            <ColumnDefinition Width="80" />
-                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="*" MinWidth="280" />
                             <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="*" MinWidth="120" />
-                            <ColumnDefinition Width="95" />
-                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" MinWidth="200" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="110" />
                             <ColumnDefinition Width="90" />
-                            <ColumnDefinition Width="70" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="80" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Classes="TableHeader" Text="Código" />
                         <TextBlock Grid.Column="1" Classes="TableHeader" Text="Nombre" />
@@ -93,19 +105,19 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vmm:ProductoRowViewModel">
                                         <Border Classes="TableRow" Padding="{DynamicResource PaddingTableRow}">
-                                            <Grid>
+                                            <Grid Loaded="OnRowLoaded" Unloaded="OnRowUnloaded">
 <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="90" />
-                                                <ColumnDefinition Width="*" MinWidth="120" />
-                                                <ColumnDefinition Width="80" />
-                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="150" />
+                                                <ColumnDefinition Width="*" MinWidth="280" />
                                                 <ColumnDefinition Width="100" />
-                                                <ColumnDefinition Width="*" MinWidth="120" />
-                                                <ColumnDefinition Width="95" />
-                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="120" />
+                                                <ColumnDefinition Width="*" MinWidth="200" />
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="100" />
+                                                <ColumnDefinition Width="110" />
                                                 <ColumnDefinition Width="90" />
-                                                <ColumnDefinition Width="70" />
-                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="80" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding Codigo}" Classes="TableCell"
                                                        Foreground="{DynamicResource AccentPrimaryLight}"

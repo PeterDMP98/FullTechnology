@@ -148,6 +148,18 @@ CREATE INDEX IF NOT EXISTS IX_Pagos_ServiceOrderId ON Pagos(ServiceOrderId);
         if (!cols.Contains("CustomerDoc"))
             ExecRaw(c, "ALTER TABLE ServiceOrders ADD COLUMN CustomerDoc TEXT");
 
+        // Migración: columna StatusChangedAt (bases creadas antes de la v3.5). Se sella
+        // cada vez que la orden cambia de estado y alimenta las alertas de tiempo del
+        // panel Inicio (recibido→listo y listo→entregado). Para las órdenes existentes
+        // se retro-rellena con ReceivedAt, que es la mejor aproximación al "último
+        // cambio" y evita (a) nulls que romperían las consultas y (b) que todo el
+        // histórico aparezca como "recientemente cambiado".
+        if (!cols.Contains("StatusChangedAt"))
+        {
+            ExecRaw(c, "ALTER TABLE ServiceOrders ADD COLUMN StatusChangedAt TEXT");
+            ExecRaw(c, "UPDATE ServiceOrders SET StatusChangedAt=ReceivedAt WHERE StatusChangedAt IS NULL");
+        }
+
         // Migración: quitar las restricciones UNIQUE de Documento/Celular en Clientes.
         // Antes causaban "UNIQUE constraint failed: Clientes.Celular" al registrar un
         // cliente solo con documento o solo con celular (el campo en blanco se duplicaba).

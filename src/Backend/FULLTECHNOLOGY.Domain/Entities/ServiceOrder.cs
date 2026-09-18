@@ -35,6 +35,9 @@ public class ServiceOrder
     public string PaymentMethod { get; set; } = "Pendiente";
     public DateTime ReceivedAt { get; set; }
     public DateTime? DeliveredAt { get; set; }
+    // Último cambio de estado (base de las alertas de tiempo del Inicio). Es
+    // null solo si nunca se selló; las alertas usan ReceivedAt como respaldo.
+    public DateTime? StatusChangedAt { get; set; }
     public string Notes { get; set; } = "";
 
     // Total = costos − descuento; un descuento mayor que los costos se trunca a cero (no hay saldo a favor).

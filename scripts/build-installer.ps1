@@ -1,13 +1,13 @@
 # build-installer.ps1 — FASE 13 / ERR-014: genera el instalador Windows de la versión Avalonia.
 # 1) Publica la app win-x64 self-contained (Release).
 # 2) Compila scripts\installer.iss con Inno Setup.
-# Salida: installer\FullTechnology_Setup_v3.2.exe
+# Salida: installer\FullTechnology_Setup_v3.5.exe
 $ErrorActionPreference = 'Stop'
 
 $root = Split-Path -Parent $PSScriptRoot
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host " FULLTECHNOLOGY v3.2 (Avalonia) - Instalador" -ForegroundColor Cyan
+Write-Host " FULLTECHNOLOGY v3.5 (Avalonia) - Instalador" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -53,7 +53,7 @@ Write-Host "============================================" -ForegroundColor Green
 Write-Host " LISTO - Instalador generado correctamente" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Ubicación: installer\FullTechnology_Setup_v3.2.exe" -ForegroundColor Green
+Write-Host "Ubicación: installer\FullTechnology_Setup_v3.5.exe" -ForegroundColor Green
 Write-Host ""
-Write-Host "Para distribuir: envía el archivo FullTechnology_Setup_v3.2.exe" -ForegroundColor Cyan
+Write-Host "Para distribuir: envía el archivo FullTechnology_Setup_v3.5.exe" -ForegroundColor Cyan
 Write-Host "El usuario final solo debe ejecutarlo y seguir los pasos." -ForegroundColor Cyan
